@@ -22,8 +22,20 @@ bool Triangle::intersect(const Ray& r) const {
   
   // TODO Part 1, task 3: implement ray-triangle intersection
   Vector3D p1(mesh->positions[v1]), p2(mesh->positions[v2]), p3(mesh->positions[v3]);
-  Vector3D edgeAB = 
-  return false;
+  Vector3D e1 = p2 - p1;
+  Vector3D e2 = p3 - p1;
+  Vector3D s  = r.o - p1;
+  Vector3D s1 = cross(r.d, e2);
+  Vector3D s2 = cross(s, e1);
+
+  Vector3D intersection = Vector3D(dot(s2, e2), dot(s1, s), dot(s2, r.d));
+  
+  float norm = 1.0/(dot(s1, e1));
+  float t = intersection.x*norm;
+  float b1 = intersection.y*norm;
+  float b2 = intersection.z*norm;
+
+  return t > r.min_t && t < r.max_t;
 }
 
 bool Triangle::intersect(const Ray& r, Intersection *isect) const {
@@ -34,7 +46,28 @@ bool Triangle::intersect(const Ray& r, Intersection *isect) const {
   Vector3D p1(mesh->positions[v1]), p2(mesh->positions[v2]), p3(mesh->positions[v3]);
   Vector3D n1(mesh->normals[v1]), n2(mesh->normals[v2]), n3(mesh->normals[v3]);
   
-  return false;
+  Vector3D e1 = p2 - p1;
+  Vector3D e2 = p3 - p1;
+  Vector3D s  = r.o - p1;
+  Vector3D s1 = cross(r.d, e2);
+  Vector3D s2 = cross(s, e1);
+
+
+  Vector3D intersection = Vector3D(dot(s2, e2), dot(s1, s), dot(s2, r.d));
+  
+  float norm = 1.0/(dot(s1, e1));
+  float t = intersection.x*norm;
+  float b1 = intersection.y*norm;
+  float b2 = intersection.z*norm;
+  //Populate Intersection with:
+  // t-value at hitpoint
+  isect->t = t;
+  // n for surface normal at point hit
+  isect->n = s2; 
+  // primitive
+  isect->n = this; 
+  // bsdf
+  return t > r.min_t && t < r.max_t;
 }
 
 void Triangle::draw(const Color& c) const {

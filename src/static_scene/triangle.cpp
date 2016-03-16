@@ -22,7 +22,7 @@ bool Triangle::intersect(const Ray& r) const {
   
   // TODO Part 1, task 3: implement ray-triangle intersection
   Vector3D p1(mesh->positions[v1]), p2(mesh->positions[v2]), p3(mesh->positions[v3]);
-
+  Vector3D edgeAB = 
   return false;
 }
 

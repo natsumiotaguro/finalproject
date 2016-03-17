@@ -67,6 +67,15 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
   // Right now we just return a single node containing all primitives.
   BVHNode *node = new BVHNode(bbox);
   node->prims = new vector<Primitive *>(prims);
+
+  if(node->prims->size() > max_leaf_size){
+    //Recurse left and right
+      //Pick the axis to recurse on (perhaps the largest dimension of the bounding box's extent).
+  //Calculate the split point you are using on this axis (perhaps the midpoint of the bounding box).
+  //Split all primitives in prims into two new vectors based on whether their bounding box's centroid's coordinate in the chosen axis is less than or greater than the split point. (p->get_bbox().centroid() is a quick way to get a bounding box centroid for Primitive *p.)
+  //Recurse, assigning the left and right children of this node to be two new calls to construct_bvh() with the two primitive lists you just generated.
+  }
+  
   return node;
   
 

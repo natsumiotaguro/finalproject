@@ -488,11 +488,10 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
   int num_samples = ns_aa; // total samples to evaluate
   Vector2D origin = Vector2D(x,y); // bottom left corner of the pixel
   Spectrum average = Spectrum();
-
   //Loop, for number of samples, get the color
   Vector2D sampler = Vector2D(0.5, 0.5); //First pixel is always 0.5
   for(int i = 0; i < num_samples; i++){
-    Vector2D point = Vector2D((double)(x + sampler.x)/sampleBuffer.w, (double)(y + sampler.y)/sampleBuffer.h);
+    Vector2D point = Vector2D(((double)x + sampler.x)/sampleBuffer.w, ((double)y + sampler.y)/sampleBuffer.h);
     Ray r = camera->generate_ray(point.x, point.y);
     average += trace_ray(r, true);
 

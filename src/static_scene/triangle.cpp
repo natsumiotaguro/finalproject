@@ -32,10 +32,13 @@ bool Triangle::intersect(const Ray& r) const {
   
   float norm = 1.0/(dot(s1, e1));
   float t = intersection.x*norm;
-  float b1 = intersection.y*norm;
-  float b2 = intersection.z*norm;
-
-  return t > r.min_t && t < r.max_t;
+  float b1 = dot(s1, s)*norm;
+  float b2 = dot(s2, r.d)*norm;
+  if(t > r.min_t && t < r.max_t && b2 > 0 && b1 < 1 && b1+b2 < 1){
+    r.max_t = t;
+    return true;
+  }
+  return false;
 }
 
 bool Triangle::intersect(const Ray& r, Intersection *isect) const {
@@ -52,22 +55,28 @@ bool Triangle::intersect(const Ray& r, Intersection *isect) const {
   Vector3D s1 = cross(r.d, e2);
   Vector3D s2 = cross(s, e1);
 
-
-  Vector3D intersection = Vector3D(dot(s2, e2), dot(s1, s), dot(s2, r.d));
-  
   float norm = 1.0/(dot(s1, e1));
-  float t = intersection.x*norm;
-  float b1 = intersection.y*norm;
-  float b2 = intersection.z*norm;
+  float t = dot(s2, e2)*norm;
+  float b1 = dot(s1, s)*norm;
+  float b2 = dot(s2, r.d)*norm;
+
   //Populate Intersection with:
-  // t-value at hitpoint
-  isect->t = t;
-  // n for surface normal at point hit
-  isect->n = s2; 
-  // primitive
-  isect->n = this; 
-  // bsdf
-  return t > r.min_t && t < r.max_t;
+  if(t > r.min_t && t < r.max_t && b1 > 0 && b1 < 1 && b2 > 0 && b1 < 1 && b1+b2 < 1){
+    // t-value at hitpoint
+    // n for surface normal at point hit
+    isect->t = t;
+    // primitive
+    isect->n = b1*n1 + b2*n2 + (1-b1-b2)*n3;
+  
+    r.max_t = t;
+    isect->primitive = this; 
+    // bsdf
+    isect->bsdf = this->get_bsdf();
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
 void Triangle::draw(const Color& c) const {

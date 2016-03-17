@@ -123,10 +123,11 @@ Ray Camera::generate_ray(double x, double y) const {
                                     -1 );
   direction = c2w*direction;
   direction.normalize();
-  Ray my_ray = Ray(direction, pos);
+  
+  Ray my_ray = Ray(pos, direction);
   my_ray.min_t = nClip;
   my_ray.max_t = fClip;
-  return Ray(direction, pos);
+  return my_ray;
 
 }
 

@@ -70,10 +70,63 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
 
   if(node->prims->size() > max_leaf_size){
     //Recurse left and right
-      //Pick the axis to recurse on (perhaps the largest dimension of the bounding box's extent).
-  //Calculate the split point you are using on this axis (perhaps the midpoint of the bounding box).
-  //Split all primitives in prims into two new vectors based on whether their bounding box's centroid's coordinate in the chosen axis is less than or greater than the split point. (p->get_bbox().centroid() is a quick way to get a bounding box centroid for Primitive *p.)
-  //Recurse, assigning the left and right children of this node to be two new calls to construct_bvh() with the two primitive lists you just generated.
+    vector<Primitive *> left;
+    vector<Primitive *> right;
+
+    float divider = 0.5;
+    while(left.empty() || right.empty()){
+      for (Primitive *p : prims){
+          Vector3D extent = bbox.extent;
+          if(extent.x > extent.y && extent.x > extent.z){
+            //Recurse on x
+            float division = bbox.min.x + divider*extent.x;
+            Vector3D centroid = p->get_bbox().centroid();
+            if(centroid.x < division){
+              left.push_back(p);
+            }
+            else{
+              right.push_back(p);
+            }
+          }
+          else if(extent.y > extent.x && extent.y > extent.z){
+            //Recurse on y
+            float division = bbox.min.y + divider*extent.y;
+            Vector3D centroid = p->get_bbox().centroid();
+             if(centroid.y < division){
+              left.push_back(p);
+            }
+            else{
+              right.push_back(p);
+            }
+          }
+          else{
+            //Recurse on z
+            float division = bbox.min.z + divider*extent.z;
+            Vector3D centroid = p->get_bbox().centroid();
+            if(centroid.z < division){
+              left.push_back(p);
+            }
+            else{
+              right.push_back(p);
+            }
+          }
+      }
+      //If left is empty or right is empty, we are doing another iteration
+      //Whic means we should empty out the left and right array
+      if(left.empty() == true){
+        //All things were to the right
+        right.clear();
+        divider+= 0.1;
+      }
+      if(right.empty() == true){
+        left.clear();
+        divider-= 0.1;
+      }
+      //Then, move the division either more to the right 
+    }
+    node->l = construct_bvh(left, max_leaf_size);
+    node->r = construct_bvh(right, max_leaf_size);
+
   }
   
   return node;
@@ -87,31 +140,69 @@ bool BVHAccel::intersect(const Ray& ray, BVHNode *node) const {
   // TODO Part 2, task 3:
   // Implement BVH intersection.
   // Currently, we just naively loop over every primitive.
-
-  for (Primitive *p : *(root->prims)) {
-    total_isects++;
-    if (p->intersect(ray)) 
-      return true;
+  double t0 = 0;
+  double t1 = 0;
+ if(node->bb.intersect(ray, t0, t1) == false){
+    return false;
   }
-  return false;
-
+  else{
+    if(node->isLeaf()){
+      //
+      bool hit = false;
+      for (Primitive *p : *(node->prims)) {
+        Intersection* tmp;
+        if (p->intersect(ray, tmp)){
+         return true;
+        }
+      }
+      return hit;
+    }
+    else{
+      bool hit1 = intersect(ray, node->l);
+      bool hit2 = intersect(ray, node->r);
+      return hit1 || hit2;
+    }
+  }
 }
+  
 
 bool BVHAccel::intersect(const Ray& ray, Intersection* i, BVHNode *node) const {
 
   // TODO Part 2, task 3:
   // Implement BVH intersection.
   // Currently, we just naively loop over every primitive.
-
-  bool hit = false;
-  for (Primitive *p : *(root->prims)) {
-    total_isects++;
-    if (p->intersect(ray, i)) 
-      hit = true;
+  double t0 = 0;
+  double t1 = 0;
+  i->tmp = -1;
+  if(node->bb.intersect(ray, t0, t1) == false){
+    return false;
   }
-  return hit;
 
+  else{
+    if(node->isLeaf()){
+      //
+      bool hit = false;
+      for (Primitive *p : *(node->prims)) {
+        Intersection* tmp;
+        i->t = -2;
+        if (p->intersect(ray, tmp)){
+          if(tmp->t > i->t){
+            i = tmp;
+          } 
+          hit = true;
+        }
+      }
+      return hit;
+    }
+    else{
+      bool hit1 = intersect(ray, i, node->l);
+      bool hit2 = intersect(ray, i, node->r);
+      return hit1 || hit2;
+    }
+  }
 }
+  
+
 
 }  // namespace StaticScene
 }  // namespace CGL

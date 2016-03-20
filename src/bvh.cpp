@@ -72,14 +72,15 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
     //Recurse left and right
     vector<Primitive *> left;
     vector<Primitive *> right;
-
     float divider = 0.5;
-    while(left.empty() || right.empty()){
+    float fail_count = 0; //If axis fails, we try a different axis
+    while(fail_count < 3 && (left.empty() == true || right.empty() == true)){
+
       for (Primitive *p : prims){
           Vector3D extent = bbox.extent;
-          if(extent.x > extent.y && extent.x > extent.z){
+          if(extent.x > extent.y && extent.x > extent.z || fail_count == 1){
             //Recurse on x
-            float division = bbox.min.x + divider*extent.x;
+            float division = (bbox.min.x + bbox.max.x)/2;
             Vector3D centroid = p->get_bbox().centroid();
             if(centroid.x < division){
               left.push_back(p);
@@ -88,9 +89,9 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
               right.push_back(p);
             }
           }
-          else if(extent.y > extent.x && extent.y > extent.z){
+          else if(extent.y > extent.x && extent.y > extent.z || fail_count == 2){
             //Recurse on y
-            float division = bbox.min.y + divider*extent.y;
+            float division = (bbox.min.y + bbox.max.y)/2;
             Vector3D centroid = p->get_bbox().centroid();
              if(centroid.y < division){
               left.push_back(p);
@@ -101,9 +102,8 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
           }
           else{
             //Recurse on z
-            float division = bbox.min.z + divider*extent.z;
+            float division = (bbox.min.z + bbox.max.z)/2;
             Vector3D centroid = p->get_bbox().centroid();
-            if(centroid.z < division){
               left.push_back(p);
             }
             else{
@@ -111,18 +111,22 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
             }
           }
       }
-      //If left is empty or right is empty, we are doing another iteration
-      //Whic means we should empty out the left and right array
-      if(left.empty() == true){
+    //If left is empty or right is empty, we are doing another iteration
+    //Whic means we should empty out the left and right array
+      if(left.empty() == true || right.empty() == true){
         //All things were to the right
-        right.clear();
-        divider+= 0.1;
-      }
-      if(right.empty() == true){
         left.clear();
-        divider-= 0.1;
+        right.clear();
+        return node;
       }
+      fail_count++;
+    }
       //Then, move the division either more to the right 
+    if(left.empty() == true || right.empty() == true){
+        //All things were to the right
+      left.clear();
+      right.clear();
+      return node;
     }
     node->l = construct_bvh(left, max_leaf_size);
     node->r = construct_bvh(right, max_leaf_size);
@@ -146,16 +150,18 @@ bool BVHAccel::intersect(const Ray& ray, BVHNode *node) const {
     return false;
   }
   else{
+    if(ray.min_t > t1 || ray.max_t < t0){
+      return false;
+    }
+
     if(node->isLeaf()){
       //
-      bool hit = false;
       for (Primitive *p : *(node->prims)) {
-        Intersection* tmp;
-        if (p->intersect(ray, tmp)){
+        if (p->intersect(ray)){
          return true;
         }
       }
-      return hit;
+      return false;
     }
     else{
       bool hit1 = intersect(ray, node->l);
@@ -173,22 +179,20 @@ bool BVHAccel::intersect(const Ray& ray, Intersection* i, BVHNode *node) const {
   // Currently, we just naively loop over every primitive.
   double t0 = 0;
   double t1 = 0;
-  i->tmp = -1;
+  i->t = -1;
   if(node->bb.intersect(ray, t0, t1) == false){
     return false;
   }
 
   else{
+    if(ray.min_t > t1 || ray.max_t < t0){
+      return false;
+    }
     if(node->isLeaf()){
       //
       bool hit = false;
       for (Primitive *p : *(node->prims)) {
-        Intersection* tmp;
-        i->t = -2;
-        if (p->intersect(ray, tmp)){
-          if(tmp->t > i->t){
-            i = tmp;
-          } 
+        if (p->intersect(ray, i)){
           hit = true;
         }
       }

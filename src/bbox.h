@@ -128,6 +128,7 @@ struct BBox {
    */
   bool intersect(const Ray& r, double& t0, double& t1) const;
 
+
   /**
    * Draw box wireframe with OpenGL.
    * \param c color of the wireframe

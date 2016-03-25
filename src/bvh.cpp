@@ -93,7 +93,7 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
             //Recurse on y
             float division = (bbox.min.y + bbox.max.y)/2;
             Vector3D centroid = p->get_bbox().centroid();
-             if(centroid.y < division){
+            if(centroid.y < division){
               left.push_back(p);
             }
             else{
@@ -104,6 +104,7 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
             //Recurse on z
             float division = (bbox.min.z + bbox.max.z)/2;
             Vector3D centroid = p->get_bbox().centroid();
+            if(centroid.z < division){
               left.push_back(p);
             }
             else{
@@ -117,7 +118,6 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
         //All things were to the right
         left.clear();
         right.clear();
-        return node;
       }
       fail_count++;
     }
@@ -146,7 +146,7 @@ bool BVHAccel::intersect(const Ray& ray, BVHNode *node) const {
   // Currently, we just naively loop over every primitive.
   double t0 = 0;
   double t1 = 0;
- if(node->bb.intersect(ray, t0, t1) == false){
+  if(node->bb.intersect(ray, t0, t1) == false){
     return false;
   }
   else{
@@ -179,7 +179,6 @@ bool BVHAccel::intersect(const Ray& ray, Intersection* i, BVHNode *node) const {
   // Currently, we just naively loop over every primitive.
   double t0 = 0;
   double t1 = 0;
-  i->t = -1;
   if(node->bb.intersect(ray, t0, t1) == false){
     return false;
   }

@@ -49,7 +49,7 @@ bool BBox::intersect(const Ray& r, double& t0, double& t1) const {
   if(t1 > t_zmax){
     t1 = t_zmax;
   }
-
+  
   return true;
 }
 

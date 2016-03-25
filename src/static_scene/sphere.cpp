@@ -13,16 +13,28 @@ bool Sphere::test(const Ray& r, double& t1, double& t2) const {
   // Implement ray - sphere intersection test.
   // Return true if there are intersections and writing the
   // smaller of the two intersection times in t1 and the larger in t2.
-  float a = dot(r.d, r.d);
-  float b = dot(2*(r.o-o), r.d);
-  float c = dot(r.o-o, r.o-o) - r2;
-  float check = b*b-4*a*c;
+  double a = dot(r.d, r.d);
+  double b = dot(2*(r.o-o), r.d);
+  double c = dot(r.o-o, r.o-o) - r2;
+  double check = b*b-4*a*c;
   if(check >= 0){
-    float tmp1 = (-1*b + sqrt(check))/(2*a);
-    float tmp2 = (-1*b - sqrt(check))/(2*a);
+    double tmp1 = (-1*b + sqrt(check))/(2*a);
+    double tmp2 = (-1*b - sqrt(check))/(2*a);
     t1 = min(tmp1, tmp2);
     t2 = max(tmp1, tmp2);
-    return true;
+    if(t1 < 0){
+      t1 = t2; //If t1 is negative, i.e origin of ray is in circle
+    }
+    if(t1 > r.min_t && t1 < r.max_t){
+      r.max_t = t1;
+      return true;
+    }
+    /*
+    else if(t2 > r.min_t && t2 < r.max_t){
+      r.max_t = t2;
+      return true;
+    }
+    */
   }
   return false;
 
@@ -36,7 +48,6 @@ bool Sphere::intersect(const Ray& r) const {
   double t1 = 0;
   double t2 = 0;
   bool result = test(r, t1, t2);
-
   return result;
 
 }
@@ -55,12 +66,8 @@ bool Sphere::intersect(const Ray& r, Intersection *i) const {
   if(result == true){
     i->t = t1;
     // primitive
-    Vector3D normal = r.o + t1*r.d - o;
-    
-    normal.normalize();
+    Vector3D normal = this->normal(r.o + t1*r.d); //Intersection Point - radius center
     i->n = normal;
-
-    r.max_t = t1;
     i->primitive = this; 
     // bsdf
     i->bsdf = this->get_bsdf();

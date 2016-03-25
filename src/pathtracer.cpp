@@ -456,7 +456,6 @@ Spectrum PathTracer::estimate_direct_lighting(const Ray& r, const Intersection& 
 Spectrum PathTracer::estimate_indirect_lighting(const Ray& r, const Intersection& isect) {
 
   // TODO Part 4
-
   Matrix3x3 o2w;
   make_coord_space(o2w, isect.n);
   Matrix3x3 w2o = o2w.T();
@@ -464,7 +463,22 @@ Spectrum PathTracer::estimate_indirect_lighting(const Ray& r, const Intersection
   Vector3D hit_p = r.o + r.d * isect.t;
   Vector3D w_out = w2o * (-r.d);
 
-  return Spectrum();
+  Vector3D w_in = Vector3D();
+  float pdf = 0;
+  Spectrum spec = isect.bsdf->sample_f(w_out, &w_in, &pdf);
+  int scale = 200;
+  float min_p = 0.0;
+  float max_p = 0.99;
+  float ill = max(min_p, min(scale*spec.illum(), max_p)); //Probability of success, not terminating
+  bool terminate = coin_flip(ill); //dont terminate if true
+  if(terminate){
+    return Spectrum();
+  }
+  int recur_depth = r.depth-1;
+  Ray recur_r = Ray(hit_p + EPS_D*o2w*w_in, o2w*w_in, recur_depth);
+  Spectrum recursed = trace_ray(recur_r,isect.bsdf->is_delta());
+  return (recursed * spec * fabs(w_in.z))/((1-ill)*pdf);     
+  
 
 }
 
@@ -522,6 +536,7 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
   for(int i = 0; i < num_samples; i++){
     Vector2D point = Vector2D(((double)x + sampler.x)/sampleBuffer.w, ((double)y + sampler.y)/sampleBuffer.h);
     Ray r = camera->generate_ray(point.x, point.y);
+    r.depth = max_ray_depth;
     average += trace_ray(r, true);
 
     sampler = gridSampler->get_sample(); //For next iteration

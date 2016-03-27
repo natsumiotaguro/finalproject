@@ -22,19 +22,19 @@ bool Sphere::test(const Ray& r, double& t1, double& t2) const {
     double tmp2 = (-1*b - sqrt(check))/(2*a);
     t1 = min(tmp1, tmp2);
     t2 = max(tmp1, tmp2);
-    if(t1 < 0){
-      t1 = t2; //If t1 is negative, i.e origin of ray is in circle
-    }
+    //if(t1 < 0){
+    //  t1 = t2; //If t1 is negative, i.e origin of ray is in circle
+    //}
     if(t1 > r.min_t && t1 < r.max_t){
       r.max_t = t1;
       return true;
     }
-    /*
+    
     else if(t2 > r.min_t && t2 < r.max_t){
       r.max_t = t2;
       return true;
     }
-    */
+    
   }
   return false;
 
@@ -64,8 +64,8 @@ bool Sphere::intersect(const Ray& r, Intersection *i) const {
   bool result = test(r, t1, t2);
   
   if(result == true){
-    i->t = t1;
-    // primitive
+
+    i->t = r.max_t;
     Vector3D normal = this->normal(r.o + t1*r.d); //Intersection Point - radius center
     i->n = normal;
     i->primitive = this; 

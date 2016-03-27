@@ -438,7 +438,9 @@ Spectrum PathTracer::estimate_direct_lighting(const Ray& r, const Intersection& 
                                             &pdf); //incoming radiance
         Vector3D w_in = w2o*wi; //Object space vector
         if(w_in.z > 0){  
-          Ray shadow = Ray(hit_p + EPS_D*wi, wi);
+          Vector3D direction = wi;
+          direction.normalize();
+          Ray shadow = Ray(hit_p + EPS_D*direction, direction);
           shadow.max_t = distToLight;
           if(!bvh->intersect(shadow)){
             Spectrum s = isect.bsdf->f(w_out, w_in); //local space
@@ -466,16 +468,17 @@ Spectrum PathTracer::estimate_indirect_lighting(const Ray& r, const Intersection
   Vector3D w_in = Vector3D();
   float pdf = 0;
   Spectrum spec = isect.bsdf->sample_f(w_out, &w_in, &pdf);
-  int scale = 200;
-  float min_p = 0.0;
-  float max_p = 0.99;
-  float ill = max(min_p, min(scale*spec.illum(), max_p)); //Probability of success, not terminating
+  int scale = 10;
+  double ill = 1 - clamp(scale * spec.illum(), 0, 1); //Probability of success, not terminating
   bool terminate = coin_flip(ill); //dont terminate if true
   if(terminate){
     return Spectrum();
   }
   int recur_depth = r.depth-1;
-  Ray recur_r = Ray(hit_p + EPS_D*o2w*w_in, o2w*w_in, recur_depth);
+  Vector3D dir = o2w*w_in;
+  dir.normalize();
+  Ray recur_r = Ray(hit_p + EPS_D*dir, dir, recur_depth);
+
   Spectrum recursed = trace_ray(recur_r,isect.bsdf->is_delta());
   return (recursed * spec * fabs(w_in.z))/((1-ill)*pdf);     
   
@@ -492,9 +495,7 @@ Spectrum PathTracer::trace_ray(const Ray &r, bool includeLe) {
   // This changes if you implement hemispherical lighting for extra credit.
   if (!bvh->intersect(r, &isect)) 
     return L_out;
-  if(isect.t < 0.01 && isect.t > -0.01){
-    //printf("isect: %f\n", isect.t);
-  }
+
   // This line returns a color depending only on the normal vector 
   // to the surface at the intersection point.
   // Remove it when you are ready to begin Part 3.

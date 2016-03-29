@@ -28,7 +28,7 @@
                 <tr>
                     <td align="middle">
                     <img src="images/part1sphere.png" width="480px" />
-                    <figcaption align="middle">Normal shading gems.</figcaption>
+                    <figcaption align="middle">Normal shading sphere.</figcaption>
                 </tr>
             </table>
         </div>
@@ -140,8 +140,17 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part2max.png" width="480px" />
-                    <figcaption align="middle">Simple BVH Example. Root node is the black rectangle, the shapes are categorized based on location.</figcaption>
+                    <img src="images/maxpart2.png" width="480px" />
+                    <figcaption align="middle">Max Statue</figcaption>
+                </tr>
+            </table>
+        </div>
+          <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/partlucy.png" width="480px" />
+                    <figcaption align="middle">Lucy has hundreds of thousands of triangles</figcaption>
                 </tr>
             </table>
         </div>
@@ -151,7 +160,7 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part2task1.png" width="480px" />
+                    <img src="images/bvh.png" width="480px" />
                     <figcaption align="middle">Simple BVH Example. Root node is the black rectangle, the shapes are categorized based on location.</figcaption>
                 </tr>
             </table>
@@ -177,7 +186,7 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3dragon.png" width="480px" />
+                    <img src="images/directdragon.png" width="480px" />
                     <figcaption align="middle">Dragon rendered with direct illumination.</figcaption>
                 </tr>
             </table>
@@ -198,15 +207,42 @@
         </div>
       <p>   I misunderstood the instructions in the project page, when z is negative, you "continue" the loop as in do not do steps 6 and 7. I only figured out that this was incorrect after thinking about what the math is saying intuitively. </p>
 <!-- Compare noise level with DIFFERENT NUMBER OF LIGHT RAYS -->
-
+  <h3 align = "middle"> Compare Different Number of Light Rays </h3>
+  <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheresray1real.png" width="480px" />
+                    <figcaption align="middle">Only one area light ray. Image has more discrepancy of color, because the light is not sampled enough times.</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheresray1.png" width="480px" />
+                    <figcaption align="middle">10 area light rays, this looks better than the previous one. </figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheresray20.png" width="480px" />
+                    <figcaption align="middle">This is with 20 light ray.s The image looks slightly smoother, but is reaching a point where it does not really affect the image.. </figcaption>
+                </tr>
+            </table>
+        </div>
  <h2 align="middle">Part 4: Indirect Illumination</h2> 
 <!-- IMPLEMENTATION-->
  <div align="center">
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
-                    <figcaption align="middle">Light rendering when surface normal was not pointing toward the light, as opposed to pointing</figcaption>
+                    <img src="images/spheres1024ind.png" width="480px" />
+                    <figcaption align="middle">The colors of the walls bleed onto the balls</figcaption>
                 </tr>
             </table>
         </div>
@@ -219,7 +255,7 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
+                    <img src="images/dragonpart3indirect.png" width="480px" />
                     <figcaption align="middle">Direct and indirect illumination render realistic images</figcaption>
                 </tr>
             </table>
@@ -230,7 +266,7 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
+                    <img src="images/dragonpart3.png" width="480px" />
                     <figcaption align="middle">Only direct illumination</figcaption>
                 </tr>
             </table>
@@ -239,7 +275,7 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
+                    <img src="images/dragonpart3indirectonly.png" width="480px" />
                     <figcaption align="middle">Only indirect illumination</figcaption>
                 </tr>
             </table>
@@ -249,8 +285,8 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
-                    <figcaption align="middle">max_ray_depth of 6</figcaption>
+                    <img src="images/spheresmaxray1.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth of 1</figcaption>
                 </tr>
             </table>
         </div>
@@ -258,8 +294,8 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
-                    <figcaption align="middle">max_ray_depth of lower bleh</figcaption>
+                    <img src="images/spheresmaxray5.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth of 5</figcaption>
                 </tr>
             </table>
         </div>
@@ -267,18 +303,19 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
-                    <figcaption align="middle">max_ray_depth of higher bleh</figcaption>
+                    <img src="images/spheresmaxray10.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth of 10</figcaption>
                 </tr>
             </table>
         </div>
 <!-- Compare sample-per-pixel-rates, range to at least 1024. -->
+ <h2 align="middle">Sample per Pixel Example: Indirect Illumination</h2> 
  <div align="center">
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
-                    <figcaption align="middle">sample-to-pixel with lowest bleh</figcaption>
+                    <img src="images/spheres1ind.png" width="480px" />
+                    <figcaption align="middle">sample-to-pixel with 1</figcaption>
                 </tr>
             </table>
         </div>
@@ -286,8 +323,8 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
-                    <figcaption align="middle">sample-to-pixel with bleh</figcaption>
+                    <img src="images/spheres4ind.png" width="480px" />
+                    <figcaption align="middle">sample-to-pixel with 4</figcaption>
                 </tr>
             </table>
         </div>
@@ -295,7 +332,43 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
+                    <img src="images/spheres16ind.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 16</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres32ind.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 32</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres64ind.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 64</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres128ind.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 128</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres1024ind.png" width="480px" />
                     <figcaption align="middle">sample-per-pixel with 1024</figcaption>
                 </tr>
             </table>
@@ -307,19 +380,118 @@
             <table style="width=100%">
                 <tr>
                     <td align="middle">
-                    <img src="images/part3bad.png" width="480px" />
-                    <figcaption align="middle">sample-per-pixel with 1024</figcaption>
+                    <img src="images/spheres1024.png" width="480px" />
+                    <figcaption align="middle">Left is reflection, Right is Reflection + Refraction (glass)</figcaption>
                 </tr>
             </table>
         </div>
-        <p> The mirror is implemented by implementing the reflection equation, which is </p>
         
         <!-- Implementation DETAILS -->
     <h3 align="middle">Task 3: Glass Material</h3> <!-- PART 2 TASK 3 ... PART 2.3 -->
     <!-- Implementation DETAILS -->
+        <p>We code the glass BSDF in the bsdf.cpp file. There are two methods to code for MirrorBSDF, f() which takes in an wo and a wi. This function can not be used since there is no way for this class to know about the Spectrum of the reflecting angles. </p>
+        <p> sample_f() method takes in an outward radiance, and gives back an w_i and a pdf that is used to scale the returning Spectrum. This method calls the reflect method, and gives back the reflectance scaled by the absolute cosine of the wi. </p>
+        <p> The reflect method takes in the wo, then calculates the reflect vector using this equation </p>
+           <p align="middle"><pre align="middle">  *wi = -wo + 2 *dot(Vector3D(0, 0, 1), wo) * Vector3D(0, 0, 1);</pre></p>
+    <h3 align="middle">Task 4: Mirror Material</h3>
+      <p> This method is more complicated in that it uses a combination of reflection and refraction, where this ratio is determined by Schlick's approximation. </p>
+      <p> The method sample_f() first starts off with checking whether the ray is leaving towards the vacuum or entering glass. This changes the ior value of the material, where ni is the current ior value, and no is the out going ior value. </p>
+      <p> Then, we calculate the cos of the radiance, as well as the sin. We then check whether the angle will be a total internal reflection. This only happens when ni is larger than no, and when sin2 is larger than 1. In the case of a total reflection, we run the reflection code and return its value. </p>
+      <p> After we know that there will be no total reflection, we calculate the Schlick's value by calculating r0 and r. By calling the coin_flip method, we determine whether this ray will produce a reflection or a refraction.</p>
+      <p> When it is a reflection, it is the same as the mirror. However, when it is the refraction, it will be more complicated. It uses the Snell's law of refraction, then calculates the out going ray. </p>
 
-        <h3 align="middle">Task 4: Maximum Ray depths</h3> <!-- PART 2 TASK 3 ... PART 2.3 -->
-
+        <h3 align="middle">Comparison: Maximum Ray depths</h3> <!-- PART 2 TASK 3 ... PART 2.3 -->
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres10depth.png" width="480px" />
+                    <figcaption align="middle">maximum ray depth with 10</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres25depth.png" width="480px" />
+                    <figcaption align="middle">maximum ray depth  with 25</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres50depth.png" width="480px" />
+                    <figcaption align="middle">maximum ray depth  with 50</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres75depth.png" width="480px" />
+                    <figcaption align="middle">maximum ray depth  with 75</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres100depth.png" width="480px" />
+                    <figcaption align="middle">maximum ray depth  with 100</figcaption>
+                </tr>
+            </table>
+        </div>
+        <h3 align="middle">Samples per Pixel Example</h3>
+            <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres1.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 1</figcaption>
+                </tr>
+            </table>
+        </div>
+            <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres4.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 4</figcaption>
+                </tr>
+            </table>
+        </div>
+            <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres16.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 16</figcaption>
+                </tr>
+            </table>
+        </div>
+            <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres64.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 64</figcaption>
+                </tr>
+            </table>
+        </div>
+            <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres1024.png" width="480px" />
+                    <figcaption align="middle">sample-per-pixel with 1024</figcaption>
+                </tr>
+            </table>
+        </div>
 </div>
 </body>
 </html>

@@ -37,7 +37,8 @@ set(APPLICATION_SOURCE
 
     # misc
     misc/sphere_drawing.cpp
-
+    misc/logtimer.cpp
+    
     # Application
     application.cpp
     main.cpp

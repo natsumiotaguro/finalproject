@@ -18,6 +18,8 @@
 #include "work_queue.h"
 #include "intersection.h"
 
+#include "misc/logtimer.h"
+
 #include "static_scene/scene.h"
 using CGL::StaticScene::Scene;
 
@@ -259,6 +261,7 @@ class PathTracer {
   std::vector<LoggedRay> rayLog;          ///< ray tracing log
   bool show_rays;                         ///< show rays from raylog
 
+  LogTimer logtimer;
 
 };
 

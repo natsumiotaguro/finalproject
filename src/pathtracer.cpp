@@ -1,7 +1,6 @@
 #include "pathtracer.h"
 #include "bsdf.h"
 #include "ray.h"
-
 #include <stack>
 #include <random>
 #include <algorithm>
@@ -510,14 +509,17 @@ Spectrum PathTracer::trace_ray(const Ray &r, bool includeLe) {
   // Delta BSDFs have no direct lighting since they are zero with probability 1 --
   // their values get accumulated through indirect lighting, where the BSDF 
   // gets to sample itself.
+  logtimer.startTime(0);
   if (!isect.bsdf->is_delta()) 
     L_out += estimate_direct_lighting(r, isect);
-
+  logtimer.recordTime(0);
   // You will implement this in part 4.
   // If the ray's depth is zero, then the path must terminate
   // and no further indirect lighting is calculated.
+  logtimer.startTime(1);
   if (r.depth > 0)
     L_out += estimate_indirect_lighting(r, isect);
+  logtimer.recordTime(1);
 
   return L_out;
 
@@ -606,7 +608,7 @@ void PathTracer::worker_thread() {
     fprintf(stdout, "\r[PathTracer] Rendering... 100%%! (%.4fs)\n", timer.duration());
     fprintf(stdout, "[PathTracer] BVH traced %llu rays.\n", bvh->total_rays);
     fprintf(stdout, "[PathTracer] Averaged %f intersection tests per ray.\n", (((double)bvh->total_isects)/bvh->total_rays));
-
+    printf("Ind0: %f, Ind1: %f\n", logtimer.getTime(0), logtimer.getTime(1));
     lock_guard<std::mutex> lk(m_done);
     state = DONE;
     cv_done.notify_one();

@@ -588,7 +588,9 @@ void PathTracer::worker_thread() {
 
   WorkItem work;
   while (continueRaytracing && workQueue.try_get_work(&work)) {
-    raytrace_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h);
+    //raytrace_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h);
+    raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, &sampleBuffer,
+                        imageTileSize, &tile_samples, &frameBuffer);
     { 
       lock_guard<std::mutex> lk(m_done);
       ++tilesDone;
@@ -606,10 +608,10 @@ void PathTracer::worker_thread() {
 
   if (continueRaytracing && workerDoneCount == numWorkerThreads) {
     timer.stop();
+    //printf("Ind0: %f, Ind1: %f\n", logtimer.getTime(0), logtimer.getTime(1));
     fprintf(stdout, "\r[PathTracer] Rendering... 100%%! (%.4fs)\n", timer.duration());
     fprintf(stdout, "[PathTracer] BVH traced %llu rays.\n", bvh->total_rays);
     fprintf(stdout, "[PathTracer] Averaged %f intersection tests per ray.\n", (((double)bvh->total_isects)/bvh->total_rays));
-    printf("Ind0: %f, Ind1: %f\n", logtimer.getTime(0), logtimer.getTime(1));
     lock_guard<std::mutex> lk(m_done);
     state = DONE;
     cv_done.notify_one();

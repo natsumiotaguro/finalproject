@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
+find_package(CUDA QUIET REQUIRED)
+
 
 # Application source
 set(APPLICATION_SOURCE
@@ -67,7 +69,7 @@ link_directories(
 #-------------------------------------------------------------------------------
 # Add executable
 #-------------------------------------------------------------------------------
-add_executable(pathtracer ${APPLICATION_SOURCE})
+CUDA_ADD_EXECUTABLE(pathtracer ${APPLICATION_SOURCE})
 
 target_link_libraries( pathtracer
     CGL ${CGL_LIBRARIES}

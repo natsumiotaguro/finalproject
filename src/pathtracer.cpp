@@ -571,7 +571,8 @@ void PathTracer::raytrace_tile(int tile_x, int tile_y,
   for (size_t y = tile_start_y; y < tile_end_y; y++) {
     if (!continueRaytracing) return;
     for (size_t x = tile_start_x; x < tile_end_x; x++) {
-        Spectrum s = raytrace_pixel(x, y);
+        //Spectrum s = raytrace_pixel(x, y);
+        Spectrum s = raytrace_cuda_pixel(x, y); //CUDA CUDA CUDA CUDA CUDA CUDA
         sampleBuffer.update_pixel(s, x, y);
     }
   }

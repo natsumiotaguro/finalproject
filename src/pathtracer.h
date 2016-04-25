@@ -17,8 +17,11 @@
 #include "image.h"
 #include "work_queue.h"
 #include "intersection.h"
-
 #include "misc/logtimer.h"
+
+// CUDA FILES
+#include <cuda.h>
+#include "cudapathtracer.h"
 
 #include "static_scene/scene.h"
 using CGL::StaticScene::Scene;

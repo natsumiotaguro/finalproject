@@ -37,6 +37,9 @@ set(APPLICATION_SOURCE
     sampler.cpp
     pathtracer.cpp
 
+    # Cuda
+    cudapathtracer.cu
+
     # misc
     misc/sphere_drawing.cpp
     misc/logtimer.cpp
@@ -45,6 +48,10 @@ set(APPLICATION_SOURCE
     application.cpp
     main.cpp
 )
+#-------------------------------------------------------------------------------
+# Compiler Flags
+#-------------------------------------------------------------------------------
+list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-O2;-DVERBOSE")
 
 #-------------------------------------------------------------------------------
 # Set include directories
@@ -55,6 +62,8 @@ include_directories(
   ${CGL_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS}
 )
+INCLUDE(FindCUDA)
+INCLUDE_DIRECTORIES(/usr/local/cuda/include)
 
 #-------------------------------------------------------------------------------
 # Set link directories
@@ -65,6 +74,7 @@ link_directories(
   ${CGL_LIBRARY_DIRS}
   ${FREETYPE_LIBRARY_DIRS}
 )
+
 
 #-------------------------------------------------------------------------------
 # Add executable

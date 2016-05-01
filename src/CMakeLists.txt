@@ -40,8 +40,9 @@ set(APPLICATION_SOURCE
     cudaVector2D.cu
     cudaVector3D.cu
     cudaSpectrum.cu
+    cudaMatrix3x3.cu
     camera.cu
-    # cudapathtracer.cu
+    #cudapathtracer.cu
 
     # misc
     misc/sphere_drawing.cpp
@@ -54,7 +55,7 @@ set(APPLICATION_SOURCE
 #-------------------------------------------------------------------------------
 # Compiler Flags
 #-------------------------------------------------------------------------------
-list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-O2;-DVERBOSE")
+list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30; -x cu; -rdc=true; -std=c++11; -O2;-DVERBOSE")
 
 #-------------------------------------------------------------------------------
 # Set include directories

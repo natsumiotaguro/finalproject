@@ -2,7 +2,8 @@
 #define CGL_CAMERA_H
 
 #include <iostream>
-
+#include <cuda.h>
+#include <cuda_runtime.h>
 #include "collada/camera_info.h"
 #include "CGL/matrix3x3.h"
 
@@ -11,6 +12,7 @@
 
 #include "cudaRay.h"
 #include "cudaMatrix3x3.h"
+#include "cudaVector3D.h"
 
 namespace CGL {
 

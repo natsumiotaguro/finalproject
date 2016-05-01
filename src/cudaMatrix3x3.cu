@@ -1,4 +1,4 @@
-#include "Cudamatrix3x3.h"
+#include "cudaMatrix3x3.h"
 
 #include <iostream>
 #include <cmath>

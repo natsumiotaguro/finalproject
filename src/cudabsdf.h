@@ -4,16 +4,18 @@
 #include "cudaSpectrum.h"
 #include "cudaVector3D.h"
 #include "cudaMatrix3x3.h"
+#include "cuda.h"
+#include "cuda_runtime.h"
 #include "helper_math.h"
 
-#include "sampler.h"
+#include "cudaSampler.h"
 
 #include <algorithm>
 
 // Helper math functions. Assume all vectors are in unit hemisphere //
 
 __device__ inline double cuda_clamp (double n, double lower, double upper) {
-  return std::max(lower, std::min(n, upper));
+  return fmax(lower, fmin(n, upper));
 }
 
 __device__ inline double cuda_cos_theta(const CudaVector3D& w) {
@@ -95,12 +97,12 @@ class CudaBSDF {
   /**
    * Reflection helper
    */
-  __device__ virtual void reflect(const CudaSpectrum& wo, CudaSpectrum* wi);
+  __device__ virtual void reflect(const CudaVector3D& wo, CudaVector3D* wi);
 
   /**
    * Refraction helper
    */
-  __device__ virtual bool refract(const CudaSpectrum& wo, CudaSpectrum* wi, float ior);
+  __device__ virtual bool refract(const CudaVector3D& wo, CudaVector3D* wi, float ior);
 
 }; // class BSDF
 
@@ -120,7 +122,7 @@ class CudaDiffuseBSDF : public CudaBSDF {
 private:
 
   CudaSpectrum albedo;
-  CosineWeightedHemisphereSampler3D sampler;
+  CudaCosineWeightedHemisphereSampler3D sampler;
 
 }; // class DiffuseBSDF
 
@@ -194,9 +196,7 @@ class CudaGlassBSDF : public CudaBSDF {
  public:
 
   __device__ CudaGlassBSDF(const CudaSpectrum& transmittance, const CudaSpectrum& reflectance,
-            float roughness, float ior) :
-    transmittance(transmittance), reflectance(reflectance),
-    roughness(roughness), ior(ior) { }
+            float roughness, float ior);
 
   __device__ CudaSpectrum f(const CudaVector3D& wo, const CudaVector3D& wi);
   __device__ CudaSpectrum sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf);
@@ -205,10 +205,10 @@ class CudaGlassBSDF : public CudaBSDF {
 
  private:
 
-  __device__ float ior;
-  __device__ float roughness;
-  __device__ CudaSpectrum reflectance;
-  __device__ CudaSpectrum transmittance;
+  float ior;
+  float roughness;
+  CudaSpectrum reflectance;
+  CudaSpectrum transmittance;
 
 }; // class GlassBSDF
 
@@ -218,7 +218,7 @@ class CudaGlassBSDF : public CudaBSDF {
 class CudaEmissionBSDF : public CudaBSDF {
  public:
 
-  __device__ CudaEmissionBSDF(const CudaSpectrum& radiance) : radiance(radiance) { }
+  __device__ CudaEmissionBSDF(const CudaSpectrum& radiance);
 
   __device__ CudaSpectrum f(const CudaVector3D& wo, const CudaVector3D& wi);
   __device__ CudaSpectrum sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf);
@@ -228,7 +228,7 @@ class CudaEmissionBSDF : public CudaBSDF {
  private:
 
   CudaSpectrum radiance;
-  CosineWeightedHemisphereSampler3D sampler;
+  CudaCosineWeightedHemisphereSampler3D sampler;
 
 }; // class EmissionBSDF
 

@@ -27,7 +27,8 @@ namespace CGL {
 PathTracer::PathTracer(size_t ns_aa,
                        size_t max_ray_depth, size_t ns_area_light,
                        size_t ns_diff, size_t ns_glsy, size_t ns_refr,
-                       size_t num_threads, HDRImageBuffer* envmap) {
+                       size_t num_threads, HDRImageBuffer* envmap,
+                       size_t use_gpu) {
   state = INIT,
   this->ns_aa = ns_aa;
   this->max_ray_depth = max_ray_depth;
@@ -35,6 +36,7 @@ PathTracer::PathTracer(size_t ns_aa,
   this->ns_diff = ns_diff;
   this->ns_glsy = ns_diff;
   this->ns_refr = ns_refr;
+  this->use_gpu = use_gpu;
 
   if (envmap) {
     this->envLight = new EnvironmentLight(envmap);
@@ -571,8 +573,8 @@ void PathTracer::raytrace_tile(int tile_x, int tile_y,
   for (size_t y = tile_start_y; y < tile_end_y; y++) {
     if (!continueRaytracing) return;
     for (size_t x = tile_start_x; x < tile_end_x; x++) {
-        //Spectrum s = raytrace_pixel(x, y);
-        Spectrum s = raytrace_cuda_pixel(x, y); //CUDA CUDA CUDA CUDA CUDA CUDA
+        Spectrum s = raytrace_pixel(x, y);
+        //Spectrum s = raytrace_cuda_pixel(x, y); //CUDA CUDA CUDA CUDA CUDA CUDA
         sampleBuffer.update_pixel(s, x, y);
     }
   }
@@ -585,12 +587,16 @@ void PathTracer::worker_thread() {
 
   Timer timer;
   timer.start();
+  testblahlah();
 
   WorkItem work;
   while (continueRaytracing && workQueue.try_get_work(&work)) {
-    //raytrace_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h);
-    raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, &sampleBuffer,
+    if (use_gpu) {
+      raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, &sampleBuffer,
                         imageTileSize, &tile_samples, &frameBuffer);
+    } else {
+      raytrace_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h);
+    }
     { 
       lock_guard<std::mutex> lk(m_done);
       ++tilesDone;

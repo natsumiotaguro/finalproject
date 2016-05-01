@@ -25,6 +25,7 @@ void usage(const char* binaryName) {
   printf("  -e  <PATH>       Path to environment map\n");
   printf("  -f  <FILENAME>   Image (.png) file to save output to in windowless mode\n");
   printf("  -r  <INT> <INT>  Width and height of output image (if windowless)\n");
+  printf("  -g               Use GPU to render\n");
   printf("  -h               Print this help message\n");
   printf("\n");
 }
@@ -75,7 +76,7 @@ int main( int argc, char** argv ) {
   bool write_to_file = false;
   size_t w = 0, h = 0;
   string filename;
-  while ( (opt = getopt(argc, argv, "s:l:t:m:e:h:f:r:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "s:l:t:m:e:h:f:r:g:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'f':
         write_to_file = true;
@@ -100,6 +101,9 @@ int main( int argc, char** argv ) {
         break;
     case 'e':
         config.pathtracer_envmap = load_exr(optarg);
+        break;
+    case 'g':
+        config.pathtracer_use_gpu = atoi(optarg);
         break;
     default:
         usage(argv[0]);

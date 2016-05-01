@@ -131,5 +131,29 @@ Ray Camera::generate_ray(double x, double y) const {
 
 }
 
+__device__ CudaRay Camera::cuda_generate_ray(double x, double y) const {
+
+  // Part 1, Task 2:
+  // compute position of the input sensor sample coordinate on the
+  // canonical sensor plane one unit away from the pinhole.
+  // Note: hFov and vFov are in degrees.
+  // 
+  CudaVector3D lower_left  = CudaVector3D(-tan(radians(hFov)*.5), -tan(radians(vFov)*.5),-1);
+  CudaVector3D upper_right = CudaVector3D( tan(radians(hFov)*.5),  tan(radians(vFov)*.5),-1);
+  CudaVector3D direction = CudaVector3D(lower_left.x + x*(upper_right.x - lower_left.x), 
+                                 lower_left.y + y*(upper_right.y - lower_left.y),
+                                    -1 );
+  direction = c2w*direction;
+  direction.normalize();
+  
+  CudaRay my_ray = CudaRay(pos, direction);
+  my_ray.min_t = nClip;
+  my_ray.max_t = fClip;
+  return my_ray;
+
+}
+
+
+
 
 } // namespace CGL

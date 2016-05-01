@@ -28,7 +28,8 @@ Application::Application(AppConfig config, bool gl) {
     config.pathtracer_ns_glsy,
     config.pathtracer_ns_refr,
     config.pathtracer_num_threads,
-    config.pathtracer_envmap
+    config.pathtracer_envmap,
+    config.pathtracer_use_gpu
   );
 
 }

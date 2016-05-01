@@ -170,7 +170,8 @@ bool BVHAccel::intersect(const Ray& ray, BVHNode *node) const {
     }
   }
 }
-  
+
+
 
 bool BVHAccel::intersect(const Ray& ray, Intersection* i, BVHNode *node) const {
 

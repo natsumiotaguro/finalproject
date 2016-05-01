@@ -53,6 +53,7 @@ struct AppConfig {
     pathtracer_num_threads = 1;
     pathtracer_envmap = NULL;
 
+    pathtracer_use_gpu = 0;
   }
 
   size_t pathtracer_ns_aa;
@@ -63,6 +64,9 @@ struct AppConfig {
   size_t pathtracer_ns_refr;
   size_t pathtracer_num_threads;
   HDRImageBuffer* pathtracer_envmap;
+
+  //For GPU
+  size_t pathtracer_use_gpu;
 
 };
 

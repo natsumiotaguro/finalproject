@@ -9,6 +9,8 @@
 #include "math.h"
 #include "ray.h"
 
+#include "cudaRay.h"
+
 
 namespace CGL {
 
@@ -85,6 +87,7 @@ class Camera {
    */
   Ray generate_ray(double x, double y) const;
 
+  __device__ CudaRay Camera::cuda_generate_ray(double x, double y) const;
  private:
   // Computes pos, screenXDir, screenYDir from target, r, phi, theta.
   void compute_position();

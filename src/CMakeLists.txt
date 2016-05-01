@@ -33,12 +33,15 @@ set(APPLICATION_SOURCE
     bvh.cpp
     bbox.cpp
     bsdf.cpp
-    camera.cpp
     sampler.cpp
     pathtracer.cpp
 
     # Cuda
-    cudapathtracer.cu
+    cudaVector2D.cu
+    cudaVector3D.cu
+    cudaSpectrum.cu
+    camera.cu
+    # cudapathtracer.cu
 
     # misc
     misc/sphere_drawing.cpp

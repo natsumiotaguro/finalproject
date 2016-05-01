@@ -17,7 +17,7 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp){
   // Make a loop that generates num_samples camera rays and traces them 
   // through the scene. Return the average Spectrum. 
 
-  int num_samples = &cuda_data->ns_aa; // total samples to evaluate
+  int num_samples = *ns_aa; // total samples to evaluate
   CudaVector2D origin = CudaVector2D(*x,*y); // bottom left corner of the pixel
   CudaSpectrum average = CudaSpectrum();
   //Loop, for number of samples, get the color

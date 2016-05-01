@@ -19,6 +19,9 @@ void Camera::configure(const CameraInfo& info, size_t screenW, size_t screenH) {
   fClip = info.fClip;
   hFov = info.hFov;
   vFov = info.vFov;
+  cudaMalloc((void **) &cudac2w, sizeof(CudaMatrix3x3));
+  cudaMalloc((void **) &cudaPos, sizeof(CudaVector3D));
+  cudaMalloc((void **) &cudaTargetPos, sizeof(CudaVector3D()));
 
   double ar1 = tan(radians(hFov) / 2) / tan(radians(vFov) / 2);
   ar = static_cast<double>(screenW) / screenH;
@@ -43,6 +46,8 @@ void Camera::place(const Vector3D& targetPos, const double phi,
   this->r = r_;
   this->minR = minR;
   this->maxR = maxR;
+  cudaMemcpy(cudaTargetPos, &targetPos, sizeof(CudaVector3D), cudaMemcpyHostToDevice);
+
   compute_position();
 }
 
@@ -54,6 +59,11 @@ void Camera::copy_placement(const Camera& other) {
   minR = other.minR;
   maxR = other.maxR;
   c2w = other.c2w;
+  cudaMemcpy(cudac2w, &c2w, sizeof(CudaMatrix3x3), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaTargetPos, &targetPos, sizeof(CudaVector3D), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaPos, &pos, sizeof(CudaVector3D), cudaMemcpyHostToDevice);
+
+
 }
 
 void Camera::set_screen_size(const size_t screenW, const size_t screenH) {
@@ -70,12 +80,15 @@ void Camera::move_by(const double dx, const double dy, const double d) {
     c2w[0] * (dx * scaleFactor) + c2w[1] * (dy * scaleFactor);
   pos += displacement;
   targetPos += displacement;
+  cudaMemcpy(cudaTargetPos, &targetPos, sizeof(CudaVector3D), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaPos, &pos, sizeof(CudaVector3D), cudaMemcpyHostToDevice);
 }
 
 void Camera::move_forward(const double dist) {
   double newR = min(max(r - dist, minR), maxR);
   pos = targetPos + ((pos - targetPos) * (newR / r));
   r = newR;
+  cudaMemcpy(cudaPos, &pos, sizeof(CudaVector3D), cudaMemcpyHostToDevice);
 }
 
 void Camera::rotate_by(const double dPhi, const double dTheta) {
@@ -107,6 +120,9 @@ void Camera::compute_position() {
                                  // directly using dirToCamera as
                                  // column 2 of the matrix takes [0 0 -1]
                                  // to the world space view direction
+
+  cudaMemcpy(cudac2w, &c2w, sizeof(CudaMatrix3x3), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaPos, &pos, sizeof(CudaVector3D), cudaMemcpyHostToDevice);
 }
 
 Ray Camera::generate_ray(double x, double y) const {
@@ -143,10 +159,10 @@ __device__ CudaRay Camera::cuda_generate_ray(double x, double y) const {
   CudaVector3D direction = CudaVector3D(lower_left.x + x*(upper_right.x - lower_left.x), 
                                  lower_left.y + y*(upper_right.y - lower_left.y),
                                     -1 );
-  direction = c2w*direction;
+  direction = cudac2w*direction;
   direction.normalize();
   
-  CudaRay my_ray = CudaRay(pos, direction);
+  CudaRay my_ray = CudaRay(cudaPos, direction);
   my_ray.min_t = nClip;
   my_ray.max_t = fClip;
   return my_ray;

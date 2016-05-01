@@ -1,7 +1,5 @@
 #include "cudapathtracer.h"
 
-namespace CGL {
-
 /*   
 *   
 *
@@ -26,7 +24,7 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp){
     CudaVector2D point = CudaVector2D(((double)x + sampler.x)/sampleBuffer.w, ((double)y + sampler.y)/sampleBuffer.h);
     CudaRay r = camera->cuda_generate_ray(point.x, point.y);
     r.depth = max_ray_depth;
-    average += trace_ray(r, true);
+    average += trace_cuda_ray(r, true);
 
     sampler = gridSampler->get_sample(); //For next iteration
     
@@ -244,4 +242,43 @@ void testblahlah() {
   }
 }
 
-} //namespace CGL
+__device__ Spectrum trace_cuda_ray(const CudaRay &r, bool includeLe) {
+
+  Intersection isect;
+  Spectrum L_out;
+
+  // You will extend this in part 2. 
+  // If no intersection occurs, we simply return black.
+  // This changes if you implement hemispherical lighting for extra credit.
+  if (!bvh->intersect(r, &isect)) 
+    return L_out;
+
+  // This line returns a color depending only on the normal vector 
+  // to the surface at the intersection point.
+  // Remove it when you are ready to begin Part 3.
+  //return normal_shading(isect.n);
+
+  // We only include the emitted light if the previous BSDF was a delta distribution
+  // or if the previous ray came from the camera.
+  if (includeLe)
+    L_out += isect.bsdf->get_emission();
+
+  // You will implement this in part 3. 
+  // Delta BSDFs have no direct lighting since they are zero with probability 1 --
+  // their values get accumulated through indirect lighting, where the BSDF 
+  // gets to sample itself.
+  logtimer.startTime(0);
+  if (!isect.bsdf->is_delta()) 
+    L_out += estimate_direct_lighting(r, isect);
+  logtimer.recordTime(0);
+  // You will implement this in part 4.
+  // If the ray's depth is zero, then the path must terminate
+  // and no further indirect lighting is calculated.
+  logtimer.startTime(1);
+  if (r.depth > 0)
+    L_out += estimate_indirect_lighting(r, isect);
+  logtimer.recordTime(1);
+
+  return L_out;
+
+}

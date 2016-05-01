@@ -58,7 +58,7 @@ class CudaMatrix3x3 {
   /**
    * Returns the ith column.
    */
-        CudaVector3D& column( int i );
+  __device__       CudaVector3D& column( int i );
   __device__ const CudaVector3D& column( int i ) const;
 
   /**

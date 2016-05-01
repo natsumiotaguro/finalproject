@@ -21,7 +21,7 @@ void Camera::configure(const CameraInfo& info, size_t screenW, size_t screenH) {
   vFov = info.vFov;
   cudaMalloc((void **) &cudac2w, sizeof(CudaMatrix3x3));
   cudaMalloc((void **) &cudaPos, sizeof(CudaVector3D));
-  cudaMalloc((void **) &cudaTargetPos, sizeof(CudaVector3D()));
+  cudaMalloc((void **) &cudaTargetPos, sizeof(CudaVector3D));
 
   double ar1 = tan(radians(hFov) / 2) / tan(radians(vFov) / 2);
   ar = static_cast<double>(screenW) / screenH;
@@ -154,15 +154,17 @@ __device__ CudaRay Camera::cuda_generate_ray(double x, double y) const {
   // canonical sensor plane one unit away from the pinhole.
   // Note: hFov and vFov are in degrees.
   // 
-  CudaVector3D lower_left  = CudaVector3D(-tan(radians(hFov)*.5), -tan(radians(vFov)*.5),-1);
-  CudaVector3D upper_right = CudaVector3D( tan(radians(hFov)*.5),  tan(radians(vFov)*.5),-1);
+  double hFovRad = hFov * (PI / 180);
+  double vFovRad = vFov * (PI / 180);
+  CudaVector3D lower_left  = CudaVector3D(-tan(cuda_getRadian(hFov)*.5), -tan(cuda_getRadian(vFov)*.5),-1);
+  CudaVector3D upper_right = CudaVector3D( tan(cuda_getRadian(hFov)*.5),  tan(cuda_getRadian(vFov)*.5),-1);
   CudaVector3D direction = CudaVector3D(lower_left.x + x*(upper_right.x - lower_left.x), 
                                  lower_left.y + y*(upper_right.y - lower_left.y),
                                     -1 );
-  direction = cudac2w*direction;
+  direction = *cudac2w*direction;
   direction.normalize();
   
-  CudaRay my_ray = CudaRay(cudaPos, direction);
+  CudaRay my_ray = CudaRay(*cudaPos, direction);
   my_ray.min_t = nClip;
   my_ray.max_t = fClip;
   return my_ray;

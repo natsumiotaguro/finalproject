@@ -13,13 +13,16 @@
 #include "camera.h"
 #include "pathtracer.h"
 
+struct data_necessary{
+	//pathtracer.cpp
+	size_t* ns_aa;
+	HDRImageBuffer *sampleBuffer;
+	Camera *camera;
+	size_t max_ray_depth;
+	Sampler2D *gridSampler;
 
-//pathtracer.cpp
-size_t* ns_aa;
-HDRImageBuffer *sampleBuffer;
-Camera *camera;
-size_t max_ray_depth;
-Sampler2D *gridSampler;
+};
+
 
 	// //bvh
 
@@ -31,10 +34,6 @@ Sampler2D *gridSampler;
 	// ImageBuffer *frameBuffer
 
 
-
-
-
-struct data_necessary* cuda_data;
 
 Spectrum raytrace_cuda_pixel(size_t x, size_t y);
 void raytrace_cuda_tile(int tile_x, int tile_y,

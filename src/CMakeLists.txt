@@ -43,7 +43,7 @@ set(APPLICATION_SOURCE
     cudaMatrix3x3.cu
     cudaSampler.cu
     camera.cu
-    #cudapathtracer.cu
+    cudapathtracer.cu
 
     # misc
     misc/sphere_drawing.cpp

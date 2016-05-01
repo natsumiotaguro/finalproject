@@ -41,6 +41,7 @@ set(APPLICATION_SOURCE
     cudaVector3D.cu
     cudaSpectrum.cu
     cudaMatrix3x3.cu
+    cudaSampler.cu
     camera.cu
     #cudapathtracer.cu
 

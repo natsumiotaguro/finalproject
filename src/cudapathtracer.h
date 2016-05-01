@@ -10,27 +10,16 @@
 #include "cudaVector2D.h"
 #include "cudaVector3D.h"
 #include "cudaSpectrum.h"
+#include "camera.h"
+#include "pathtracer.h"
 
 
-namespace CGL {
-
-struct data_necessary{
-
-	//pathtracer.cpp
-	size_t* ns_aa;
-	HDRImageBuffer *sampleBuffer;
-	Camera *camera;
-	size_t max_ray_depth;
-	Sampler2D *gridSampler;
-	
-
-	//camera.cpp
-	// double *hFov;
-	// double *vFov;
-	// Matrix3x3 *c2w;
-	// Vector3D *pos;
-	// double *nClip;
-	// double *fClip;
+//pathtracer.cpp
+size_t* ns_aa;
+HDRImageBuffer *sampleBuffer;
+Camera *camera;
+size_t max_ray_depth;
+Sampler2D *gridSampler;
 
 	// //bvh
 
@@ -43,7 +32,7 @@ struct data_necessary{
 
 
 
-};
+
 
 struct data_necessary* cuda_data;
 
@@ -57,6 +46,5 @@ void testblahlah();
 void cudaMallocNecessary(struct data_necessary* host_data);
 
 
-}
 
 #endif // CUDA_PATHTRACER_H

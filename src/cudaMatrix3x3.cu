@@ -5,30 +5,28 @@
 
 using namespace std;
 
-namespace CGL {
-
-  double& CudaMatrix3x3::operator()( int i, int j ) {
+  __device__ double& CudaMatrix3x3::operator()( int i, int j ) {
     return entries[j][i];
   }
 
-  const double& CudaMatrix3x3::operator()( int i, int j ) const {
+  __device__ const double& CudaMatrix3x3::operator()( int i, int j ) const {
     return entries[j][i];
   }
 
-  Vector3D& CudaMatrix3x3::operator[]( int j ) {
+  __device__ CudaVector3D& CudaMatrix3x3::operator[]( int j ) {
       return entries[j];
   }
 
-  const Vector3D& CudaMatrix3x3::operator[]( int j ) const {
+  __device__ const CudaVector3D& CudaMatrix3x3::operator[]( int j ) const {
     return entries[j];
   }
 
-  void CudaMatrix3x3::zero( double val ) {
+  __device__ void CudaMatrix3x3::zero( double val ) {
     // sets all elements to val
-    entries[0] = entries[1] = entries[2] = Vector3D( val, val, val );
+    entries[0] = entries[1] = entries[2] = CudaVector3D( val, val, val );
   }
 
-  double CudaMatrix3x3::det( void ) const {
+  __device__ double CudaMatrix3x3::det( void ) const {
     const CudaMatrix3x3& A( *this );
 
     return -A(0,2)*A(1,1)*A(2,0) + A(0,1)*A(1,2)*A(2,0) +
@@ -36,13 +34,13 @@ namespace CGL {
             A(0,1)*A(1,0)*A(2,2) + A(0,0)*A(1,1)*A(2,2) ;
   }
 
-  double CudaMatrix3x3::norm( void ) const {
+  __device__ double CudaMatrix3x3::norm( void ) const {
     return sqrt( entries[0].norm2() +
                  entries[1].norm2() +
                  entries[2].norm2() );
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::operator-( void ) const {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::operator-( void ) const {
 
    // returns -A
     const CudaMatrix3x3& A( *this );
@@ -55,7 +53,7 @@ namespace CGL {
     return B;
   }
 
-  void CudaMatrix3x3::operator+=( const CudaMatrix3x3& B ) {
+  __device__ void CudaMatrix3x3::operator+=( const CudaMatrix3x3& B ) {
 
     CudaMatrix3x3& A( *this );
     double* Aij = (double*) &A;
@@ -72,7 +70,7 @@ namespace CGL {
     *Aij++ += *Bij++;
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::operator-( const CudaMatrix3x3& B ) const {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::operator-( const CudaMatrix3x3& B ) const {
     const CudaMatrix3x3& A( *this );
     CudaMatrix3x3 C;
 
@@ -85,7 +83,7 @@ namespace CGL {
     return C;
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::operator*( double c ) const {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::operator*( double c ) const {
     const CudaMatrix3x3& A( *this );
     CudaMatrix3x3 B;
 
@@ -98,7 +96,7 @@ namespace CGL {
     return B;
   }
 
-  CudaMatrix3x3 operator*( double c, const CudaMatrix3x3& A ) {
+  __device__ CudaMatrix3x3 operator*( double c, const CudaMatrix3x3& A ) {
 
     CudaMatrix3x3 cA;
     const double* Aij = (const double*) &A;
@@ -117,7 +115,7 @@ namespace CGL {
     return cA;
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::operator*( const CudaMatrix3x3& B ) const {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::operator*( const CudaMatrix3x3& B ) const {
     const CudaMatrix3x3& A( *this );
     CudaMatrix3x3 C;
 
@@ -135,13 +133,13 @@ namespace CGL {
     return C;
   }
 
-  Vector3D CudaMatrix3x3::operator*( const Vector3D& x ) const {
+  __device__ CudaVector3D CudaMatrix3x3::operator*( const CudaVector3D& x ) const {
     return x[0]*entries[0] +
            x[1]*entries[1] +
            x[2]*entries[2] ;
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::T( void ) const {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::T( void ) const {
     const CudaMatrix3x3& A( *this );
     CudaMatrix3x3 B;
 
@@ -154,7 +152,7 @@ namespace CGL {
     return B;
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::inv( void ) const {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::inv( void ) const {
     const CudaMatrix3x3& A( *this );
     CudaMatrix3x3 B;
 
@@ -167,7 +165,7 @@ namespace CGL {
     return B;
   }
 
-  void CudaMatrix3x3::operator/=( double x ) {
+  __device__ void CudaMatrix3x3::operator/=( double x ) {
     CudaMatrix3x3& A( *this );
     double rx = 1./x;
 
@@ -178,7 +176,7 @@ namespace CGL {
     }
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::identity( void ) {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::identity( void ) {
     CudaMatrix3x3 B;
 
     B(0,0) = 1.; B(0,1) = 0.; B(0,2) = 0.;
@@ -188,7 +186,7 @@ namespace CGL {
     return B;
   }
 
-  CudaMatrix3x3 CudaMatrix3x3::crossProduct( const Vector3D& u ) {
+  __device__ CudaMatrix3x3 CudaMatrix3x3::crossProduct( const CudaVector3D& u ) {
     CudaMatrix3x3 B;
 
     B(0,0) =   0.;  B(0,1) = -u.z;  B(0,2) =  u.y;
@@ -198,7 +196,7 @@ namespace CGL {
     return B;
   }
 
-  CudaMatrix3x3 outer( const Vector3D& u, const Vector3D& v ) {
+  __device__ CudaMatrix3x3 outer( const CudaVector3D& u, const CudaVector3D& v ) {
     CudaMatrix3x3 B;
     double* Bij = (double*) &B;
 
@@ -214,7 +212,7 @@ namespace CGL {
 
     return B;
   }
-
+  /*
   std::ostream& operator<<( std::ostream& os, const CudaMatrix3x3& A ) {
     for( int i = 0; i < 3; i++ )
     {
@@ -230,12 +228,12 @@ namespace CGL {
 
     return os;
   }
+  */
 
-  Vector3D& CudaMatrix3x3::column( int i ) {
+  __device__ CudaVector3D& CudaMatrix3x3::column( int i ) {
     return entries[i];
   }
 
-  const Vector3D& CudaMatrix3x3::column( int i ) const {
+  __device__ const CudaVector3D& CudaMatrix3x3::column( int i ) const {
     return entries[i];
   }
-}

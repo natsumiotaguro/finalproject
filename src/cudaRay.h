@@ -14,7 +14,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include "cudaVector3D.h"
-#include "math_constants.h"
+#include <math_constants.h>
 
 #define CUDA_D 0x7f800000
 

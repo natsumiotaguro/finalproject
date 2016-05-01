@@ -22,6 +22,15 @@ void Camera::configure(const CameraInfo& info, size_t screenW, size_t screenH) {
   cudaMalloc((void **) &cudac2w, sizeof(CudaMatrix3x3));
   cudaMalloc((void **) &cudaPos, sizeof(CudaVector3D));
   cudaMalloc((void **) &cudaTargetPos, sizeof(CudaVector3D));
+  cudaMalloc((void **) &cudahFov, sizeof(double));
+  cudaMalloc((void **) &cudavFov, sizeof(double));
+  cudaMalloc((void **) &cudaNClip, sizeof(double));
+  cudaMalloc((void **) &cudaFClip, sizeof(double));
+
+  cudaMemcpy(cudahFov, &hFov,  sizeof(double), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudavFov, &vFov,  sizeof(double), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaNClip, &nClip, sizeof(double), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaFClip, &fClip, sizeof(double), cudaMemcpyHostToDevice);
 
   double ar1 = tan(radians(hFov) / 2) / tan(radians(vFov) / 2);
   ar = static_cast<double>(screenW) / screenH;
@@ -72,6 +81,8 @@ void Camera::set_screen_size(const size_t screenW, const size_t screenH) {
   ar = 1.0 * screenW / screenH;
   hFov = 2 * degrees(atan(((double) screenW) / (2 * screenDist)));
   vFov = 2 * degrees(atan(((double) screenH) / (2 * screenDist)));
+  cudaMemcpy(cudahFov, &hFov,  sizeof(double), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudavFov, &vFov,  sizeof(double), cudaMemcpyHostToDevice);
 }
 
 void Camera::move_by(const double dx, const double dy, const double d) {
@@ -154,10 +165,10 @@ __device__ CudaRay Camera::cuda_generate_ray(double x, double y) const {
   // canonical sensor plane one unit away from the pinhole.
   // Note: hFov and vFov are in degrees.
   // 
-  double hFovRad = hFov * (PI / 180);
-  double vFovRad = vFov * (PI / 180);
-  CudaVector3D lower_left  = CudaVector3D(-tan(cuda_getRadian(hFov)*.5), -tan(cuda_getRadian(vFov)*.5),-1);
-  CudaVector3D upper_right = CudaVector3D( tan(cuda_getRadian(hFov)*.5),  tan(cuda_getRadian(vFov)*.5),-1);
+  double hFovRad = *cudahFov * (PI / 180);
+  double vFovRad = *cudavFov * (PI / 180);
+  CudaVector3D lower_left  = CudaVector3D(-tan(hFovRad*.5), -tan(vFovRad*.5),-1);
+  CudaVector3D upper_right = CudaVector3D( tan(hFovRad*.5),  tan(vFovRad*.5),-1);
   CudaVector3D direction = CudaVector3D(lower_left.x + x*(upper_right.x - lower_left.x), 
                                  lower_left.y + y*(upper_right.y - lower_left.y),
                                     -1 );
@@ -165,8 +176,8 @@ __device__ CudaRay Camera::cuda_generate_ray(double x, double y) const {
   direction.normalize();
   
   CudaRay my_ray = CudaRay(*cudaPos, direction);
-  my_ray.min_t = nClip;
-  my_ray.max_t = fClip;
+  my_ray.min_t = *cudaNClip;
+  my_ray.max_t = *cudaFClip;
   return my_ray;
 
 }

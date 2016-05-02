@@ -182,7 +182,8 @@ void testblahlah() {
 
 __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe) {
 
-  Intersection isect;
+
+  CudaIntersection isect;
   CudaSpectrum L_out;
 
   // You will extend this in part 2. 

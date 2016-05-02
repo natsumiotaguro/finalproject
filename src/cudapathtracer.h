@@ -56,4 +56,5 @@ struct data_necessary* cudaMallocNecessary(struct data_necessary* host_data);
 __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe); 
 }
 
+
 #endif // CUDA_PATHTRACER_H

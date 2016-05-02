@@ -1,4 +1,4 @@
-#include "bsdf.h"
+#include "cudabsdf.h"
 
 #include <iostream>
 #include <algorithm>
@@ -8,7 +8,7 @@ using std::min;
 using std::max;
 using std::swap;
 
-void make_cuda_coord_space(CudaMatrix3x3& o2w, const CudaVector3D& n) {
+__device__ void make_cuda_coord_space(CudaMatrix3x3& o2w, const CudaVector3D& n) {
 
     CudaVector3D z = CudaVector3D(n.x, n.y, n.z);
     CudaVector3D h = z;
@@ -33,11 +33,11 @@ __device__ CudaDiffuseBSDF::CudaDiffuseBSDF(const CudaSpectrum& a) {
   this->albedo = a;
 }
 
-CudaSpectrum CudaDiffuseBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
+__device__ CudaSpectrum CudaDiffuseBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
   return albedo * (1.0 / PI);
 }
 
-CudaSpectrum CudaDiffuseBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
+__device__ CudaSpectrum CudaDiffuseBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
   *wi = sampler.get_sample(pdf);
   return albedo * (1.0 / PI);
 }
@@ -49,13 +49,13 @@ __device__ CudaMirrorBSDF::CudaMirrorBSDF(const CudaSpectrum& reflectance) {
   this->reflectance = reflectance;
 }
 
-CudaSpectrum CudaMirrorBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
+__device__ CudaSpectrum CudaMirrorBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
   //not used not used NOT USED
   printf("USEING \n");
   return CudaSpectrum();
 }
 
-CudaSpectrum CudaMirrorBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
+__device__ CudaSpectrum CudaMirrorBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
 
   // TODO Part 5:
   // Implement MirrorBSDF
@@ -81,18 +81,18 @@ Spectrum GlossyBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 
 // Refraction BSDF //
 
-__device__ CudaRefractionBSDF(const CudaSpectrum& transmittance, float roughness, float ior) {
+__device__ CudaRefractionBSDF::CudaRefractionBSDF(const CudaSpectrum& transmittance, float roughness, float ior) {
   this->transmittance = transmittance;
   this->roughness = roughness;
   this->ior = ior;
 }
 
-CudaSpectrum CudaRefractionBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
+__device__ CudaSpectrum CudaRefractionBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
     return CudaSpectrum(); //NOT USED NOT USED NOT USED
   
 }
 
-CudaSpectrum CudaRefractionBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
+__device__ CudaSpectrum CudaRefractionBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
   // TODO Part 5: NOT USED NOT USED NOT USED
   // Implement RefractionBSDF     
     return CudaSpectrum();
@@ -100,15 +100,14 @@ CudaSpectrum CudaRefractionBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* 
 
 // Glass BSDF //
 
-__device__ GlassBSDF::GlassBSDF(const CudaSpectrum& transmittance, const CudaSpectrum& reflectance,
-          float roughness, float ior) {
+__device__ CudaGlassBSDF::CudaGlassBSDF(const CudaSpectrum& transmittance, const CudaSpectrum& reflectance, float roughness, float ior) {
   this->transmittance = transmittance;
   this->reflectance = reflectance;
   this->roughness = roughness;
   this->ior = ior;
 }
 
-CudaSpectrum CudaGlassBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
+__device__ CudaSpectrum CudaGlassBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
   CudaVector3D tmp = CudaVector3D();
   printf("hohoho\n");
   double is_internal = !refract(wo, &tmp, ior);
@@ -138,10 +137,10 @@ CudaSpectrum CudaGlassBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
       //return refr(di), 1-R*Li(no/ni)^2/cos(thetai), 1-R)
     }
   }
-  return CudaSpectrum();
+  //return CudaSpectrum(); unreachable
 }
 
-CudaSpectrum CudaGlassBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
+__device__ CudaSpectrum CudaGlassBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
     CudaVector3D tmp_wo = -1*wo;
     
     double vacuum_check = wo.z;
@@ -199,7 +198,7 @@ CudaSpectrum CudaGlassBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, f
  // return Spectrum();
 }
 
-void CudaBSDF::reflect(const CudaVector3D& wo, CudaVector3D* wi) {
+__device__ void CudaBSDF::reflect(const CudaVector3D& wo, CudaVector3D* wi) {
   // TODO Part 5:
   // Implement reflection of wo about normal (0,0,1) and store result in wi.
   //*wi = wo; //This makes the ray go the other direction
@@ -207,7 +206,7 @@ void CudaBSDF::reflect(const CudaVector3D& wo, CudaVector3D* wi) {
   //wi->z = -1*wo.z;
 }
 
-bool CudaBSDF::refract(const CudaVector3D& wo, CudaVector3D* wi, float ior) {
+__device__ bool CudaBSDF::refract(const CudaVector3D& wo, CudaVector3D* wi, float ior) {
   // TODO Part 5:
   // Use Snell's Law to refract wo surface and store result ray in wi.
   // Return false if refraction does not occur due to total internal reflection
@@ -250,16 +249,16 @@ bool CudaBSDF::refract(const CudaVector3D& wo, CudaVector3D* wi, float ior) {
 
 // Emission BSDF //
 
-__device__ CudaEmissionBSDF(const CudaSpectrum& radiance) {
+__device__ CudaEmissionBSDF::CudaEmissionBSDF(const CudaSpectrum& radiance) {
   this->radiance = radiance;
 }
 
 
-CudaSpectrum CudaEmissionBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
+__device__ CudaSpectrum CudaEmissionBSDF::f(const CudaVector3D& wo, const CudaVector3D& wi) {
   return CudaSpectrum();
 }
 
-CudaSpectrum CudaEmissionBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
+__device__ CudaSpectrum CudaEmissionBSDF::sample_f(const CudaVector3D& wo, CudaVector3D* wi, float* pdf) {
   *pdf = 1.0 / PI;
   *wi  = sampler.get_sample(pdf);
   return CudaSpectrum();

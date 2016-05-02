@@ -242,6 +242,10 @@ void PathTracer::build_accel() {
     primitives.reserve(primitives.size() + obj_prims.size());
     primitives.insert(primitives.end(), obj_prims.begin(), obj_prims.end());
   }
+  CudaPrimitive** primitivesArr = (CudaPrimitive**)malloc(sizeof(CudaPrimitive*) * primitives.size());
+  for (int i = 0; i < primitives.size(); i++) {
+    primitivesArr[i] = primitives[i];
+  }
   timer.stop();
   fprintf(stdout, "Done! (%.4f sec)\n", timer.duration());
 
@@ -250,6 +254,7 @@ void PathTracer::build_accel() {
   fflush(stdout);
   timer.start();
   bvh = new BVHAccel(primitives);
+  cudabvh = new CudaBVHAccel(primitivesArr);
   timer.stop();
   fprintf(stdout, "Done! (%.4f sec)\n", timer.duration());
 

@@ -44,10 +44,10 @@ set(APPLICATION_SOURCE
     cudaSampler.cu
     cudabsdf.cu
     cudabbox.cu
-    #cudabvh.cu
+    cudabvh.cu
     cudaColor.cu
     camera.cu
-    # cudapathtracer.cu
+    cudapathtracer.cu
     cudaRandom_util.cu
 
     # misc

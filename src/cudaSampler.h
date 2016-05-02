@@ -12,7 +12,7 @@
 
 
 
-//#define PI 3.1415926
+#define PI 3.1415926
 
 /**
  * Interface for generating point samples within the unit square

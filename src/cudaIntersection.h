@@ -23,7 +23,7 @@ struct CudaIntersection {
   CudaIntersection() {
         this->t = CUDA_D;
         this->primitive = NULL;
-        this->bsdf = NULL
+        this->bsdf = NULL;
         }
 
   double t;    ///< time of intersection

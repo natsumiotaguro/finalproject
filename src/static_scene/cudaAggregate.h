@@ -1,5 +1,5 @@
 #ifndef CGL_STATICSCENE_CUDAAGGREGATE_H
-#define CGL_STATICSCENE_AGGREGATE_H
+#define CGL_STATICSCENE_CUDAAGGREGATE_H
 
 #include "scene.h"
 
@@ -27,7 +27,7 @@ class CudaAggregate : public CudaPrimitive {
   // implementation should store the address of the primitive that the ray
   // intersected and not that of the aggregate itself.
 
-  std::vector<Primitive*> primitives; ///< primitives enclosed in the aggregate
+  std::vector<CudaPrimitive*> primitives; ///< primitives enclosed in the aggregate
 
   /**
    * Get BSDF.

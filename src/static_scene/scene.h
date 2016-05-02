@@ -3,6 +3,8 @@
 
 #include "CGL/CGL.h"
 #include "primitive.h"
+#include "../cudaIntersection.h"
+#include "cudaPrimitive.h"
 
 #include <vector>
 

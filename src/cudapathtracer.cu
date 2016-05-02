@@ -219,7 +219,7 @@ __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_
   return L_out;
 
 }
-__device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data){
+__device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data) {
 
 // TODO Part 3
 
@@ -235,7 +235,8 @@ __device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection&
   const CudaVector3D& w_out = w2o * (-r.d);
 
   CudaSpectrum L_out = CudaSpectrum();
-  for(CudaSceneLight* light : cuda_data->scene->lights){
+  for (int j = 0; j < cuda_data->scene->lights_len; j++){
+    CudaSceneLight* light = cuda_data->scene->lights[j];
     int num_samples = 1;
     if(light->is_delta_light() == false){//Check if delta light.
       //If yes, ask for one sample

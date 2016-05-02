@@ -16,7 +16,7 @@ class CudaSceneObject {
    * Get all the primitives in the scene object.
    * \return a vector of all the primitives in the scene object
    */
-  virtual std::vector<CudaPrimitive*> get_primitives() const = 0;
+  virtual CudaPrimitive** get_primitives() const = 0;
 
   /**
    * Get the surface BSDF of the object's surface.
@@ -42,17 +42,21 @@ class CudaSceneLight {
 
 
 struct CudaScene {
-  CudaScene(const std::vector<CudaSceneObject *>& objects,
-        const std::vector<CudaSceneLight *>& lights){
+  CudaScene(CudaSceneObject**& objects, size_t objects_len,
+        CudaSceneLight**& lights, size_t  lights_len) {
     this->objects = objects;
     this->lights = lights;
+    this->objects_len = objects_len;
+    this->lights_len = lights_len;
   }
   // kept to make sure they don't get deleted, in case the
   //  primitives depend on them (e.g. Mesh Triangles).
-  std::vector<CudaSceneObject*> objects;
+  CudaSceneObject** objects;
+  size_t objects_len;
 
   // for sake of consistency of the scene object Interface
-  std::vector<CudaSceneLight*> lights;
+  CudaSceneLight** lights;
+  size_t lights_len;
 
   // TODO (sky) :
   // Adding object with emission BSDFs as mesh lights and sphere lights so 

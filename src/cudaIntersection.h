@@ -18,7 +18,7 @@ class CudaPrimitive;
  */
 struct CudaIntersection {
 
-  CudaIntersection() {
+  __device__ CudaIntersection() {
     this->t = CUDA_D;
     this->primitive = NULL;
     this->bsdf = NULL;

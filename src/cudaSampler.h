@@ -7,12 +7,12 @@
 #include <curand_kernel.h>
 #include "cudaVector2D.h"
 #include "cudaVector3D.h"
-//#include "CGL/misc.h"
+#include "CGL/misc.h"
 #include "cudaRandom_util.h"
 
 
 
-#define PI 3.1415926
+//#define PI 3.1415926
 
 /**
  * Interface for generating point samples within the unit square

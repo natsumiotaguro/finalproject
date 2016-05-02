@@ -6,7 +6,6 @@
 #include "../cudaRay.h"
 #include "../cudaColor.h"
 
-namespace StaticScene {
 
 /**
  * The abstract base class primitive is the bridge between geometry processing
@@ -66,6 +65,5 @@ class CudaPrimitive {
 
 };
 
-} // namespace StaticScene
 
 #endif //CGL_STATICSCENE_CUDAPRIMITIVE_H

@@ -42,17 +42,17 @@ class CudaSceneLight {
 
 
 struct CudaScene {
-  CudaSceneScene(const std::vector<CudaSceneObject *>& objects,
+  CudaScene(const std::vector<CudaSceneObject *>& objects,
         const std::vector<CudaSceneLight *>& lights){
     this->objects = objects;
     this->lights = lights;
   }
   // kept to make sure they don't get deleted, in case the
   //  primitives depend on them (e.g. Mesh Triangles).
-  std::vector<SceneObject*> objects;
+  std::vector<CudaSceneObject*> objects;
 
   // for sake of consistency of the scene object Interface
-  std::vector<SceneLight*> lights;
+  std::vector<CudaSceneLight*> lights;
 
   // TODO (sky) :
   // Adding object with emission BSDFs as mesh lights and sphere lights so 

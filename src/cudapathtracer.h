@@ -13,6 +13,10 @@
 #include "cudaSampler.h"
 #include "cudaIntersection.h"
 
+#include "static_scene/cudaScene.h"
+
+//#include "static_scene/environment_light.h"
+
 #include "image.h"
 #include "camera.h"
 #include "pathtracer.h"

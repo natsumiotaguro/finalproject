@@ -62,9 +62,9 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
 void testblahlah();
 
 struct data_necessary* cudaMallocNecessary(struct data_necessary* host_data);
-__device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe, struct data_necessary* cuda_data); 
-__device__ CudaSpectrum estimate_direct_lighting(const CudaRay& r, const CudaIntersection& isect, struct data_necessary* cuda_data); 
-__device__ CudaSpectrum estimate_indirect_lighting(const CudaRay& r, const CudaIntersection& isect, struct data_necessary* cuda_data); 
+__device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_necessary* cuda_data); 
+__device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data); 
+__device__ CudaSpectrum estimate_indirect_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data); 
 
 }
 

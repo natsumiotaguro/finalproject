@@ -182,7 +182,7 @@ void testblahlah() {
   }
 }
 
-__device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe, struct data_necessary* cuda_data) {
+__device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_necessary* cuda_data) {
 
 
   CudaIntersection isect;
@@ -219,7 +219,7 @@ __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe, struct 
   return L_out;
 
 }
-__device__ CudaSpectrum estimate_direct_lighting(const CudaRay& r, const CudaIntersection& isect, struct data_necessary* cuda_data){
+__device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data){
 
 // TODO Part 3
 

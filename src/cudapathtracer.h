@@ -17,7 +17,7 @@
 #include "static_scene/cudaScene.h"
 #include "static_scene/scene.h"
 //#include "static_scene/environment_light.h"
-
+#include "bvh.h"
 #include "image.h"
 #include "camera.h"
 #include "pathtracer.h"
@@ -35,6 +35,20 @@ struct data_necessary{
 
 	CudaBVHAccel* bvh;   
 };
+
+struct host_data_necessary{
+	//pathtracer.cpp
+	size_t* ns_aa;
+	size_t* ns_area_light;
+	HDRImageBuffer *sampleBuffer;
+	Camera *camera;
+	size_t* max_ray_depth;
+	Sampler2D *gridSampler;
+	StaticScene::Scene* scene; 
+
+	StaticScene::BVHAccel* bvh;   
+};
+
 
 struct no_malloc_necessary{
 

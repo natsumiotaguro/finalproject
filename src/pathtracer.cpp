@@ -242,7 +242,7 @@ void PathTracer::build_accel() {
     primitives.reserve(primitives.size() + obj_prims.size());
     primitives.insert(primitives.end(), obj_prims.begin(), obj_prims.end());
   }
-  CudaPrimitive** primitivesArr = (CudaPrimitive**)malloc(sizeof(CudaPrimitive*) * primitives.size());
+  primitivesArr = (CudaPrimitive**)malloc(sizeof(CudaPrimitive*) * primitives.size());
   for (int i = 0; i < primitives.size(); i++) {
     primitivesArr[i] = primitives[i];
   }
@@ -557,6 +557,23 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
   
 
   return average/(double)num_samples;
+}
+
+struct host_data_necessary* cuda_data PathTracer::fillNecessaryCudaData(){
+  struct host_data_necessary* cuda_data = sizeof(struct host_data_necessary);
+  //pathtracer.cpp
+  cuda_data->ns_aa = &ns_aa;
+  cuda_data->ns_area_light =  &ns_area_light;
+  cuda_data->sampleBuffer = &sampleBuffer;
+  cuda_data->camera = camera;
+  cuda_data->max_ray_depth = &max_ray_depth;
+  cuda_data->gridSampler = gridSampler;
+  cuda_data->scene = scene; 
+
+  cuda_data->bvh = bvh;  
+  cuda_data->primitivesArr = primitivesArr;
+
+
 }
 
 void PathTracer::raytrace_tile(int tile_x, int tile_y,

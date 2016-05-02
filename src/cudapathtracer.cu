@@ -237,7 +237,7 @@ __device__ CudaSpectrum estimate_direct_lighting(const CudaRayRay& r, const Cuda
   const CudaVector3D& w_out = w2o * (-r.d);
 
   CudaSpectrum L_out = CudaSpectrum();
-  for(SceneLight* light : scene->lights){
+  for(CudaSceneLight* light : scene->lights){
     int num_samples = 1;
     if(light->is_delta_light() == false){//Check if delta light.
       //If yes, ask for one sample

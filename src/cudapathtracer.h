@@ -24,7 +24,7 @@ struct data_necessary{
 	Camera *camera;
 	size_t* max_ray_depth;
 	CudaSampler2D *gridSampler;
-
+	Scene* scene; 
 };
 
 struct no_malloc_necessary{
@@ -44,7 +44,7 @@ struct no_malloc_necessary{
 	// ImageBuffer *frameBuffer
 
 
-
+CudaScene* cuda_scene;
 
 void raytrace_cuda_tile(int tile_x, int tile_y,
                                 int tile_w, int tile_h, HDRImageBuffer *sampleBuffer,
@@ -54,6 +54,9 @@ void testblahlah();
 
 struct data_necessary* cudaMallocNecessary(struct data_necessary* host_data);
 __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe); 
+__device__ CudaSpectrum estimate_direct_lighting(const CudaRayRay& r, const CudaIntersection& isect); 
+__device__ CudaSpectrum estimate_indirect_lighting(const CudaRayRay& r, const CudaIntersection& isect); 
+
 }
 
 

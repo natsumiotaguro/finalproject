@@ -221,5 +221,57 @@ __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe) {
   return L_out;
 
 }
+__device__ CudaSpectrum estimate_direct_lighting(const CudaRayRay& r, const CudaIntersection& isect){
+
+// TODO Part 3
+
+  // make a coordinate system for a hit point
+  // with N aligned with the Z direction.
+  CudaMatrix3x3 o2w;
+  make_cuda_coord_space(o2w, isect.n);
+  CudaMatrix3x3 w2o = o2w.T();
+
+  // w_out points towards the source of the ray (e.g.,
+  // toward the camera if this is a primary ray)
+  const CudaVector3D& hit_p = r.o + r.d * isect.t;
+  const CudaVector3D& w_out = w2o * (-r.d);
+
+  CudaSpectrum L_out = CudaSpectrum();
+  for(SceneLight* light : scene->lights){
+    int num_samples = 1;
+    if(light->is_delta_light() == false){//Check if delta light.
+      //If yes, ask for one sample
+      num_samples = ns_area_light;
+    }
+    CudaSpectrum sample_out = CudaSpectrum();
+    for(int i = 0; i < num_samples; i++){
+        CudaVector3D wi = CudaVector3D();
+        float distToLight = 0;
+        float pdf = 0;
+        CudaSpectrum rad_in = light->sample_L(hit_p, &wi,
+                                            &distToLight,
+                                            &pdf); //incoming radiance
+        CudaVector3D w_in = w2o*wi; //Object space vector
+        if(w_in.z > 0){  
+          CudaVector3D direction = wi;
+          direction.normalize();
+          CudaRay shadow = CudaRay(hit_p + EPS_D*direction, direction);
+          shadow.max_t = distToLight;
+          if(!bvh->intersect(shadow)){
+            CudaSpectrum s = isect.bsdf->f(w_out, w_in); //local space
+            sample_out += s * (rad_in * fabs(w_in.z))/ pdf;
+          }
+
+        }
+
+    }
+    L_out += sample_out/num_samples;
+  }
+  return L_out;
+
+
+
+}
+
 
 } //namespace

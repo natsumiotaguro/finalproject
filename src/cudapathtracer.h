@@ -69,13 +69,11 @@ struct no_malloc_necessary{
 	// vector<int> *tile_samples;
 	// ImageBuffer *frameBuffer
 
-
-CudaScene* *cuda_scene;
-CudaBVHAccel *bvh;
 void raytrace_cuda_tile(int tile_x, int tile_y,
-                                int tile_w, int tile_h, HDRImageBuffer *sampleBuffer,
-                                size_t imageTileSize, vector<int> *tile_samples,
-                                ImageBuffer *frameBuffer);
+                        int tile_w, int tile_h, 
+                        struct data_necessary *data, 
+                        struct no_malloc_necessary *no_data);
+
 void testblahlah();
 
 struct data_necessary* cudaMallocNecessary(struct data_necessary* host_data);

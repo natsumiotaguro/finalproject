@@ -43,7 +43,7 @@ struct CudaRay {
    * \param d direction of the ray
    * \param depth depth of the ray
    */
-    __device__ CudaRay(const CudaVector3D& o, const CudaVector3D& d, int depth = 0) {
+  __device__ CudaRay(const CudaVector3D& o, const CudaVector3D& d, int depth = 0) {
     this->o = o;
     this->d = d;
     this->depth = depth;

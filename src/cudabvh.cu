@@ -10,7 +10,7 @@ using namespace std;
 
 namespace StaticScene {
 
-__device__ CudaBVHAccel::CudaBVHAccel(const std::vector<Primitive *> &_primitives,
+__device__ CudaBVHAccel::CudaBVHAccel(const std::vector<CudaPrimitive *> &_primitives,
                    size_t max_leaf_size) {
 
   root = construct_bvh(_primitives, max_leaf_size);
@@ -25,7 +25,7 @@ __device__ CudaBBox CudaBVHAccel::get_bbox() const {
   return root->bb;
 }
 
-__device__ void CudaBVHAccel::draw(CudaBVHNode *node, const Color& c) const {
+__device__ void CudaBVHAccel::draw(CudaBVHNode *node, const CudaColor& c) const {
   if (node->isLeaf()) {
     for (CudaPrimitive *p : *(node->prims))
       p->draw(c);
@@ -35,7 +35,7 @@ __device__ void CudaBVHAccel::draw(CudaBVHNode *node, const Color& c) const {
   }
 }
 
-__device__ void CudaBVHAccel::drawOutline(CudaBVHNode *node, const Color& c) const {
+__device__ void CudaBVHAccel::drawOutline(CudaBVHNode *node, const CudaColor& c) const {
   if (node->isLeaf()) {
     for (CudaPrimitive *p : *(node->prims))
       p->drawOutline(c);

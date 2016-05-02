@@ -21,10 +21,10 @@ namespace StaticScene {
 struct CudaBVHNode {
 
   __device__ CudaBVHNode(CudaBBox bb) {
-    this->bb = bb
-    this->l = NULL
-    this->r = NULL
-    this->prims = NULL
+    this->bb = bb;
+    this->l = NULL;
+    this->r = NULL;
+    this->prims = NULL;
   }
 
   __device__ ~CudaBVHNode() {

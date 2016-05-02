@@ -13,6 +13,7 @@
 #include "cudaSampler.h"
 #include "cudaIntersection.h"
 #include "cudabvh.h"
+#include "static_scene/cudaPrimitive.h"
 
 #include "static_scene/cudaScene.h"
 #include "static_scene/scene.h"
@@ -33,7 +34,8 @@ struct data_necessary{
 	CudaSampler2D *gridSampler;
 	CudaScene* scene; 
 
-	CudaBVHAccel* bvh;   
+	CudaBVHAccel* bvh;
+	CudaPrimitive** primitivesArr;   
 };
 
 struct host_data_necessary{
@@ -47,6 +49,7 @@ struct host_data_necessary{
 	StaticScene::Scene* scene; 
 
 	StaticScene::BVHAccel* bvh;   
+	StaticScene::Primitive** primitivesArr;
 };
 
 

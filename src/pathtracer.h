@@ -22,6 +22,7 @@
 // CUDA FILES
 #include <cuda.h>
 #include "cudapathtracer.h"
+#include "cudabvh.h"
 
 #include "static_scene/scene.h"
 using CGL::StaticScene::Scene;
@@ -162,7 +163,7 @@ class PathTracer {
    */
   void visualize_accel() const;
 
-struct data_necessary fillNecessaryCudaData();
+struct host_data_necessary *fillNecessaryCudaData();
 
   /**
    * Trace an ray in the scene.
@@ -233,7 +234,8 @@ struct data_necessary fillNecessaryCudaData();
 
   // Components //
 
-  BVHAccel* bvh;                 ///< BVH accelerator aggregate
+  StaticScene::BVHAccel* bvh;                 ///< BVH accelerator aggregate
+  CudaBVHAccel* cudabvh;
   EnvironmentLight *envLight;    ///< environment map
   Sampler2D* gridSampler;        ///< samples unit grid
   Sampler3D* hemisphereSampler;  ///< samples unit hemisphere

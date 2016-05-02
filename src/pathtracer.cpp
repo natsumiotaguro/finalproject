@@ -242,7 +242,7 @@ void PathTracer::build_accel() {
     primitives.reserve(primitives.size() + obj_prims.size());
     primitives.insert(primitives.end(), obj_prims.begin(), obj_prims.end());
   }
-  primitivesArr = (CudaPrimitive**)malloc(sizeof(CudaPrimitive*) * primitives.size());
+  primitivesArr = (StaticScene::Primitive**)malloc(sizeof(CudaPrimitive*) * primitives.size());
   for (int i = 0; i < primitives.size(); i++) {
     primitivesArr[i] = primitives[i];
   }
@@ -253,8 +253,8 @@ void PathTracer::build_accel() {
   fprintf(stdout, "[PathTracer] Building BVH from %lu primitives... ", primitives.size()); 
   fflush(stdout);
   timer.start();
-  bvh = new BVHAccel(primitives);
-  cudabvh = new CudaBVHAccel(primitivesArr);
+  bvh = new StaticScene::BVHAccel(primitives);
+  //cudabvh = new CudaBVHAccel(primitivesArr);
   timer.stop();
   fprintf(stdout, "Done! (%.4f sec)\n", timer.duration());
 
@@ -559,8 +559,8 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
   return average/(double)num_samples;
 }
 
-struct host_data_necessary* cuda_data PathTracer::fillNecessaryCudaData(){
-  struct host_data_necessary* cuda_data = sizeof(struct host_data_necessary);
+struct host_data_necessary* PathTracer::fillNecessaryCudaData(){
+  struct host_data_necessary* cuda_data = (struct host_data_necessary* )malloc(sizeof(struct host_data_necessary));
   //pathtracer.cpp
   cuda_data->ns_aa = &ns_aa;
   cuda_data->ns_area_light =  &ns_area_light;

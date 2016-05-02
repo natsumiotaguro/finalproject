@@ -70,8 +70,6 @@ struct no_malloc_necessary{
 	// ImageBuffer *frameBuffer
 
 
-CudaScene* *cuda_scene;
-CudaBVHAccel *bvh;
 void raytrace_cuda_tile(int tile_x, int tile_y,
                                 int tile_w, int tile_h, HDRImageBuffer *sampleBuffer,
                                 size_t imageTileSize, vector<int> *tile_samples,

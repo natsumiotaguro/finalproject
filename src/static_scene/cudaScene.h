@@ -2,7 +2,7 @@
 #define CGL_CUDASTATICSCENE_SCENE_H
 
 #include "cudaPrimitive.h"
-#include <vector>
+
 
 
 
@@ -16,13 +16,13 @@ class CudaSceneObject {
    * Get all the primitives in the scene object.
    * \return a vector of all the primitives in the scene object
    */
-  virtual CudaPrimitive** get_primitives() const = 0;
+  __device__ virtual CudaPrimitive** get_primitives() const = 0;
 
   /**
    * Get the surface BSDF of the object's surface.
    * \return the BSDF of the objects's surface
    */
-  virtual CudaBSDF* get_bsdf() const = 0;
+  __device__ virtual CudaBSDF* get_bsdf() const = 0;
 
 };
 
@@ -42,7 +42,7 @@ class CudaSceneLight {
 
 
 struct CudaScene {
-  CudaScene(CudaSceneObject**& objects, size_t objects_len,
+  __device__ CudaScene(CudaSceneObject**& objects, size_t objects_len,
         CudaSceneLight**& lights, size_t  lights_len) {
     this->objects = objects;
     this->lights = lights;

@@ -576,6 +576,14 @@ struct host_data_necessary* PathTracer::fillNecessaryCudaData(){
 
 }
 
+struct no_malloc_necessary* PathTracer::fillNoMallocData(){
+  struct no_malloc_necessary *no_mall;
+  no_mall->imageTileSize = imageTileSize;
+  no_mall->tile_samples = &tile_samples; 
+  no_mall->frameBuffer = &frameBuffer;
+
+}
+
 void PathTracer::raytrace_tile(int tile_x, int tile_y,
                                int tile_w, int tile_h) {
 

@@ -2,7 +2,7 @@
 #define CGL_STATICSCENE_CUDAAGGREGATE_H
 
 #include "cudaScene.h"
-#include "../cudabsdf.h"
+//#include "../cudabsdf.h"
 
 
 /**

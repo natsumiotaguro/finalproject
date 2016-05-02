@@ -2,9 +2,7 @@
 #define CGL_STATICSCENE_PRIMITIVE_H
 
 #include "../intersection.h"
-#include "../cudaIntersection.h"
 #include "../bbox.h"
-#include "../cudabbox.h"
 namespace CGL { namespace StaticScene {
 
 /**

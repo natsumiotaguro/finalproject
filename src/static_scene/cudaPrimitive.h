@@ -3,8 +3,7 @@
 
 #include "../cudaIntersection.h"
 #include "../cudabbox.h"
-#include "../cudaRay.h"
-#include "../cudaColor.h"
+
 
 
 /**

@@ -164,7 +164,7 @@ class PathTracer {
   void visualize_accel() const;
 
 struct host_data_necessary *fillNecessaryCudaData();
-
+struct no_malloc_necessary* fillNoMallocData();
   /**
    * Trace an ray in the scene.
    */

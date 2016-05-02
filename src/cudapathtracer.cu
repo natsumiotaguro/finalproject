@@ -27,7 +27,7 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp,  
     CudaVector2D point = CudaVector2D(((double)*x + sampler.x)/sampleBuffer->w, ((double)*y + sampler.y)/sampleBuffer->h);
     CudaRay r = camera->cuda_generate_ray(point.x, point.y);
     r.depth = *cuda_data->max_ray_depth;
-    average += trace_cuda_ray(r, true);
+    average += trace_cuda_ray(r, true, cuda_data);
 
     sampler = cuda_data->gridSampler->get_sample(); //For next iteration
     
@@ -38,7 +38,9 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp,  
 
 }
 
-
+__global__ void instantiate_Necesary(struct data_necessary* data){
+	//BVH Instantiation Here
+}
 
 //Returns struct with all CUDA pointers
 struct data_necessary* cudaMallocNecessary(struct data_necessary* data){
@@ -180,7 +182,7 @@ void testblahlah() {
   }
 }
 
-__device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe) {
+__device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe, struct data_necessary* cuda_data) {
 
 
   CudaIntersection isect;
@@ -189,7 +191,7 @@ __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe) {
   // You will extend this in part 2. 
   // If no intersection occurs, we simply return black.
   // This changes if you implement hemispherical lighting for extra credit.
-  if (!bvh->intersect(r, &isect)) 
+  if (!cuda_data->bvh->intersect(r, &isect)) 
     return L_out;
 
   // This line returns a color depending only on the normal vector 
@@ -206,22 +208,18 @@ __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe) {
   // Delta BSDFs have no direct lighting since they are zero with probability 1 --
   // their values get accumulated through indirect lighting, where the BSDF 
   // gets to sample itself.
-  logtimer.startTime(0);
   if (!isect.bsdf->is_delta()) 
-    L_out += estimate_direct_lighting(r, isect);
-  logtimer.recordTime(0);
+    L_out += estimate_direct_lighting(r, isect, cuda_data);
   // You will implement this in part 4.
   // If the ray's depth is zero, then the path must terminate
   // and no further indirect lighting is calculated.
-  logtimer.startTime(1);
   if (r.depth > 0)
-    L_out += estimate_indirect_lighting(r, isect);
-  logtimer.recordTime(1);
-
+    L_out += estimate_indirect_lighting(r, isect, cuda_data);
+  
   return L_out;
 
 }
-__device__ CudaSpectrum estimate_direct_lighting(const CudaRayRay& r, const CudaIntersection& isect){
+__device__ CudaSpectrum estimate_direct_lighting(const CudaRay& r, const CudaIntersection& isect, struct data_necessary* cuda_data){
 
 // TODO Part 3
 
@@ -237,11 +235,11 @@ __device__ CudaSpectrum estimate_direct_lighting(const CudaRayRay& r, const Cuda
   const CudaVector3D& w_out = w2o * (-r.d);
 
   CudaSpectrum L_out = CudaSpectrum();
-  for(CudaSceneLight* light : scene->lights){
+  for(CudaSceneLight* light : cuda_data->scene->lights){
     int num_samples = 1;
     if(light->is_delta_light() == false){//Check if delta light.
       //If yes, ask for one sample
-      num_samples = ns_area_light;
+      num_samples = *cuda_data->ns_area_light;
     }
     CudaSpectrum sample_out = CudaSpectrum();
     for(int i = 0; i < num_samples; i++){
@@ -257,7 +255,7 @@ __device__ CudaSpectrum estimate_direct_lighting(const CudaRayRay& r, const Cuda
           direction.normalize();
           CudaRay shadow = CudaRay(hit_p + EPS_D*direction, direction);
           shadow.max_t = distToLight;
-          if(!bvh->intersect(shadow)){
+          if(!cuda_data->bvh->intersect(shadow)){
             CudaSpectrum s = isect.bsdf->f(w_out, w_in); //local space
             sample_out += s * (rad_in * fabs(w_in.z))/ pdf;
           }

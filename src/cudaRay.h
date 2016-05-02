@@ -25,9 +25,6 @@
 #define PART_4 (PART >= 4)
 #define PART_5 (PART >= 5)
 
-namespace CGL {
-
-
 struct CudaRay {
   size_t depth;  ///< depth of the Ray
 
@@ -101,7 +98,5 @@ struct CudaLoggedRay {
     CudaVector3D d;
     double hit_t;
 };
-
-}  // namespace CGL
 
 #endif  // CGL_CUDARAY_H

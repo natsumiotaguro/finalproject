@@ -7,6 +7,7 @@
 //#include "CGL/CGL.h"
 
 #include "cudaRay.h"
+#include "cudaColor.h"
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "helper_math.h"
@@ -54,8 +55,8 @@ struct CudaBBox {
    * \param max the max corner
    */
   __device__ CudaBBox(const CudaVector3D& min, const CudaVector3D& max) {
-    this->min = min
-    this->max = max
+    this->min = min;
+    this->max = max;
     this->extent = max - min;
   }
 
@@ -144,7 +145,7 @@ struct CudaBBox {
    * Draw box wireframe with OpenGL.
    * \param c color of the wireframe
    */
-  __device__ void draw(Color c) const;
+  __device__ void draw(CudaColor c) const;
 };
 
 //std::ostream& operator<<(std::ostream& os, const BBox& b);

@@ -45,6 +45,7 @@ set(APPLICATION_SOURCE
     cudabsdf.cu
     cudabbox.cu
     cudabvh.cu
+    cudaColor.cu
     camera.cu
     # cudapathtracer.cu
 

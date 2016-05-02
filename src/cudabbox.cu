@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <iostream>
 
-namespace CGL {
 
 __device__ bool CudaBBox::intersect(const CudaRay& r, double& t0, double& t1) const {
 
@@ -56,7 +55,7 @@ __device__ bool CudaBBox::intersect(const CudaRay& r, double& t0, double& t1) co
 
 
 
-__device__ void CudaBBox::draw(Color c) const {
+__device__ void CudaBBox::draw(CudaColor c) const {
 /*
   glColor4f(c.r, c.g, c.b, c.a);
 
@@ -89,7 +88,7 @@ __device__ void CudaBBox::draw(Color c) const {
 	glVertex3d(min.x, max.y, max.z);
   glVertex3d(min.x, min.y, max.z);
 	glEnd();
-  /*
+  */
 
 }
 /*
@@ -98,4 +97,3 @@ std::ostream& operator<<(std::ostream& os, const BBox& b) {
 }
 */
 
-} // namespace CGL

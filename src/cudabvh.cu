@@ -1,6 +1,6 @@
-#include "bvh.h"
+#include "cudabvh.h"
 
-#include "CGL/CGL.h"
+//#include "CGL/CGL.h"
 #include "static_scene/triangle.h"
 
 #include <iostream>
@@ -10,24 +10,24 @@ using namespace std;
 
 namespace StaticScene {
 
-BVHAccel::BVHAccel(const std::vector<Primitive *> &_primitives,
+__device__ CudaBVHAccel::CudaBVHAccel(const std::vector<Primitive *> &_primitives,
                    size_t max_leaf_size) {
 
   root = construct_bvh(_primitives, max_leaf_size);
 
 }
 
-BVHAccel::~BVHAccel() {
+__device__ CudaBVHAccel::~CudaBVHAccel() {
   if (root) delete root;
 }
 
-BBox BVHAccel::get_bbox() const {
+__device__ CudaBBox CudaBVHAccel::get_bbox() const {
   return root->bb;
 }
 
-void BVHAccel::draw(BVHNode *node, const Color& c) const {
+__device__ void CudaBVHAccel::draw(CudaBVHNode *node, const Color& c) const {
   if (node->isLeaf()) {
-    for (Primitive *p : *(node->prims))
+    for (CudaPrimitive *p : *(node->prims))
       p->draw(c);
   } else {
     draw(node->l, c);
@@ -35,9 +35,9 @@ void BVHAccel::draw(BVHNode *node, const Color& c) const {
   }
 }
 
-void BVHAccel::drawOutline(BVHNode *node, const Color& c) const {
+__device__ void CudaBVHAccel::drawOutline(CudaBVHNode *node, const Color& c) const {
   if (node->isLeaf()) {
-    for (Primitive *p : *(node->prims))
+    for (CudaPrimitive *p : *(node->prims))
       p->drawOutline(c);
   } else {
     drawOutline(node->l, c);
@@ -45,7 +45,7 @@ void BVHAccel::drawOutline(BVHNode *node, const Color& c) const {
   }
 }
 
-BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t max_leaf_size) {
+__device__ CudaBVHNode *CudaBVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t max_leaf_size) {
   
   // TODO Part 2, task 1:
   // Construct a BVH from the given vector of primitives and maximum leaf
@@ -54,18 +54,18 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
   // primitives.
 
 
-  BBox centroid_box, bbox;
+  CudaBBox centroid_box, bbox;
 
-  for (Primitive *p : prims) {
-    BBox bb = p->get_bbox();
+  for (CudaPrimitive *p : prims) {
+    CudaBBox bb = p->get_bbox();
     bbox.expand(bb);
-    Vector3D c = bb.centroid();
+    CudaVector3D c = bb.centroid();
     centroid_box.expand(c);
   }
 
   // You'll want to adjust this code.
   // Right now we just return a single node containing all primitives.
-  BVHNode *node = new BVHNode(bbox);
+  CudaBVHNode *node = new CudaBVHNode(bbox);
   node->prims = new vector<Primitive *>(prims);
 
   if(node->prims->size() > max_leaf_size){
@@ -76,12 +76,12 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
     float fail_count = 0; //If axis fails, we try a different axis
     while(fail_count < 3 && (left.empty() == true || right.empty() == true)){
 
-      for (Primitive *p : prims){
-          Vector3D extent = bbox.extent;
+      for (CudaPrimitive *p : prims){
+          CudaVector3D extent = bbox.extent;
           if(extent.x > extent.y && extent.x > extent.z || fail_count == 1){
             //Recurse on x
             float division = (bbox.min.x + bbox.max.x)/2;
-            Vector3D centroid = p->get_bbox().centroid();
+            CudaVector3D centroid = p->get_bbox().centroid();
             if(centroid.x < division){
               left.push_back(p);
             }
@@ -92,7 +92,7 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
           else if(extent.y > extent.x && extent.y > extent.z || fail_count == 2){
             //Recurse on y
             float division = (bbox.min.y + bbox.max.y)/2;
-            Vector3D centroid = p->get_bbox().centroid();
+            CudaVector3D centroid = p->get_bbox().centroid();
             if(centroid.y < division){
               left.push_back(p);
             }
@@ -103,7 +103,7 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
           else{
             //Recurse on z
             float division = (bbox.min.z + bbox.max.z)/2;
-            Vector3D centroid = p->get_bbox().centroid();
+            CudaVector3D centroid = p->get_bbox().centroid();
             if(centroid.z < division){
               left.push_back(p);
             }
@@ -139,7 +139,7 @@ BVHNode *BVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t ma
 }
 
 
-bool BVHAccel::intersect(const Ray& ray, BVHNode *node) const {
+__device__ bool CudaBVHAccel::intersect(const CudaRay& ray, CudaBVHNode *node) const {
 
   // TODO Part 2, task 3:
   // Implement BVH intersection.
@@ -173,7 +173,7 @@ bool BVHAccel::intersect(const Ray& ray, BVHNode *node) const {
 
 
 
-bool BVHAccel::intersect(const Ray& ray, Intersection* i, BVHNode *node) const {
+__device__ bool CudaBVHAccel::intersect(const CudaRay& ray, CudaIntersection* i, CudaBVHNode *node) const {
 
   // TODO Part 2, task 3:
   // Implement BVH intersection.
@@ -191,7 +191,7 @@ bool BVHAccel::intersect(const Ray& ray, Intersection* i, BVHNode *node) const {
     if(node->isLeaf()){
       //
       bool hit = false;
-      for (Primitive *p : *(node->prims)) {
+      for (CudaPrimitive *p : *(node->prims)) {
         if (p->intersect(ray, i)){
           hit = true;
         }

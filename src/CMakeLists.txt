@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 find_package(CUDA QUIET REQUIRED)
 
-
+SET(CUDA_SEPARABLE_COMPILATION ON)
 # Application source
 set(APPLICATION_SOURCE
 
@@ -79,6 +79,7 @@ INCLUDE_DIRECTORIES(/usr/local/cuda/include)
 # Set link directories
 #-------------------------------------------------------------------------------
 link_directories(
+${CUDA_LIBRARIES}
   ${GLEW_LIBRARY_DIRS}
   ${GLFW_LIBRARY_DIRS}
   ${CGL_LIBRARY_DIRS}
@@ -98,6 +99,7 @@ target_link_libraries( pathtracer
     ${OPENGL_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     ${CMAKE_THREADS_INIT}
+
 )
 
 #-------------------------------------------------------------------------------

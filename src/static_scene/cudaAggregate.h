@@ -4,7 +4,6 @@
 #include "cudaScene.h"
 #include "../cudabsdf.h"
 
-namespace StaticScene {
 
 /**
  * Aggregate provides an interface for grouping multiple primitives together.
@@ -28,7 +27,7 @@ class CudaAggregate : public CudaPrimitive {
   // implementation should store the address of the primitive that the ray
   // intersected and not that of the aggregate itself.
 
-  std::vector<CudaPrimitive*> primitives; ///< primitives enclosed in the aggregate
+  CudaPrimitive **primitives; ///< primitives enclosed in the aggregate
 
   /**
    * Get BSDF.
@@ -43,7 +42,5 @@ class CudaAggregate : public CudaPrimitive {
 
 };
 
-
-} // namespace StaticScene
 
 #endif //CGL_STATICSCENE_CUDAAGGREGATE_H

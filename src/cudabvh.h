@@ -6,9 +6,6 @@
 #include "static_scene/cudaPrimitive.h"
 #include "cudaIntersection.h"
 #include "cudaColor.h"
-#include <vector>
-namespace StaticScene {
-
 
 /**
  * A node in the BVH accelerator aggregate.
@@ -35,14 +32,14 @@ struct CudaBVHNode {
     if (r) delete r;
   }
 
-  __device__ inline bool isLeaf() const { 
+  __device__ inline bool isLeaf() { 
     return l == NULL && r == NULL; 
   }
 
   CudaBBox bb;        ///< bounding box of the node
   CudaBVHNode* l;     ///< left child node
   CudaBVHNode* r;     ///< right child node
-  std::vector<CudaPrimitive *> *prims;
+  CudaPrimitive ***prims;
 
 };
 
@@ -66,7 +63,7 @@ class CudaBVHAccel : public CudaAggregate {
    * \param primitives primitives to build from
    * \param max_leaf_size maximum number of primitives to be stored in leaves
    */
-  __device__ CudaBVHAccel(const std::vector<CudaPrimitive*>& primitives, size_t max_leaf_size = 4);
+  __device__ CudaBVHAccel(CudaPrimitive**& prims, size_t prim_len, size_t max_leaf_size = 4);
 
   /**
    * Destructor.
@@ -79,7 +76,7 @@ class CudaBVHAccel : public CudaAggregate {
    * Get the world space bounding box of the aggregate.
    * \return world space bounding box of the aggregate
    */
-  __device__ CudaBBox get_bbox() const;
+  __device__ CudaBBox get_bbox();
 
   /**
    * Ray - Aggregate intersection.
@@ -89,12 +86,12 @@ class CudaBVHAccel : public CudaAggregate {
    * \return true if the given ray intersects with the aggregate,
              false otherwise
    */
-  __device__ bool intersect(const CudaRay& r) const {
+  __device__ bool intersect(CudaRay& r) {
     ++total_rays;
     return intersect(r, root);
   }
 
-  __device__ bool intersect(const CudaRay& r, CudaBVHNode *node) const;
+  __device__ bool intersect(CudaRay& r, CudaBVHNode *node);
 
   /**
    * Ray - Aggregate intersection 2.
@@ -109,12 +106,12 @@ class CudaBVHAccel : public CudaAggregate {
    * \return true if the given ray intersects with the aggregate,
              false otherwise
    */
-  __device__ bool intersect(const CudaRay& r, CudaIntersection* i) const {
+  __device__ bool intersect(CudaRay& r, CudaIntersection* i) {
     ++total_rays;
     return intersect(r, i, root);
   }
 
-  __device__ bool intersect(const CudaRay& r, CudaIntersection* i, CudaBVHNode *node) const;
+  __device__ bool intersect(CudaRay& r, CudaIntersection* i, CudaBVHNode *node);
 
   /**
    * Get BSDF of the surface material
@@ -122,31 +119,31 @@ class CudaBVHAccel : public CudaAggregate {
    * because it does not have a surface material. Therefore this
    * should always return a null pointer.
    */
-  __device__ CudaBSDF* get_bsdf() const { return NULL; }
+  __device__ CudaBSDF* get_bsdf() { return NULL; }
 
   /**
    * Get entry point (root) - used in visualizer
    */
-  __device__ CudaBVHNode* get_root() const { return root; }
+  __device__ CudaBVHNode* get_root() { return root; }
 
   /**
    * Draw the BVH with OpenGL - used in visualizer
    */
-  __device__ void draw(const CudaColor& c) const { }
-  __device__ void draw(CudaBVHNode *node, const CudaColor& c) const;
+  __device__ void draw(CudaColor& c) { }
+  __device__ void draw(CudaBVHNode *node, CudaColor& c);
 
   /**
    * Draw the BVH outline with OpenGL - used in visualizer
    */
-  __device__ void drawOutline(const CudaColor& c) const { }
-  __device__ void drawOutline(CudaBVHNode *node, const CudaColor& c) const;
+  __device__ void drawOutline(CudaColor& c) { }
+  __device__ void drawOutline(CudaBVHNode *node, CudaColor& c);
 
   mutable unsigned long long total_rays, total_isects;
  private:
   CudaBVHNode* root; ///< root node of the BVH
-  __device__ CudaBVHNode *construct_bvh(const std::vector<CudaPrimitive*>& prims, size_t max_leaf_size);
+  size_t prim_len;
+  __device__ CudaBVHNode *construct_bvh(CudaPrimitive**& prims, size_t max_leaf_size, size_t prim_len);
 };
 
-} // namespace StaticScene
 
 #endif // CGL_CUDABVH_H

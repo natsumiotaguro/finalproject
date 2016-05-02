@@ -43,7 +43,7 @@ __global__ void instantiate_Necesary(struct data_necessary* data){
 }
 
 //Returns struct with all CUDA pointers
-struct data_necessary* cudaMallocNecessary(struct data_necessary* data){
+struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
     struct data_necessary* cuda_data;
     cudaMalloc((void **) &cuda_data, sizeof(struct data_necessary));
 
@@ -78,7 +78,7 @@ struct data_necessary* cudaMallocNecessary(struct data_necessary* data){
 
 
 void raytrace_cuda_tile(int tile_x, int tile_y,
-                                int tile_w, int tile_h, struct data_necessary *data, struct no_malloc_necessary *no_data) {
+                                int tile_w, int tile_h, struct host_data_necessary *data, struct no_malloc_necessary *no_data) {
 
     struct data_necessary* cuda_data = cudaMallocNecessary(data);
 

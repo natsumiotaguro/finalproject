@@ -72,12 +72,12 @@ struct no_malloc_necessary{
 
 void raytrace_cuda_tile(int tile_x, int tile_y,
                         int tile_w, int tile_h, 
-                        struct data_necessary *data, 
+                        struct host_data_necessary *data, 
                         struct no_malloc_necessary *no_data);
 
 void testblahlah();
 
-struct data_necessary* cudaMallocNecessary(struct data_necessary* host_data);
+struct data_necessary* cudaMallocNecessary(struct host_data_necessary* host_data);
 __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_necessary* cuda_data); 
 __device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data); 
 __device__ CudaSpectrum estimate_indirect_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data); 

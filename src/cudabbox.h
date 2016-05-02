@@ -1,5 +1,5 @@
-#ifndef CGL_BBOX_H
-#define CGL_BBOX_H
+#ifndef CGL_CUDABBOX_H
+#define CGL_CUDABBOX_H
 
 #include <utility>
 #include <algorithm>
@@ -42,7 +42,7 @@ struct CudaBBox {
    * Constructor.
    * Creates a bounding box that includes a single point.
    */
-  __device__ CudaBBox(const CudaVector3D& p){
+  __device__ CudaBBox(const CudaVector3D& p) {
     this->min = p;
     this->max = p;
     this->extent = max - min; 
@@ -151,4 +151,4 @@ struct CudaBBox {
 //std::ostream& operator<<(std::ostream& os, const BBox& b);
 
 
-#endif // CGL_BBOX_H
+#endif // CGL_CUDABBOX_H

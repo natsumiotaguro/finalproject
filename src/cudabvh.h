@@ -130,14 +130,14 @@ class CudaBVHAccel : public CudaAggregate {
   /**
    * Draw the BVH with OpenGL - used in visualizer
    */
-  __device__ void draw(const Color& c) const { }
-  __device__ void draw(CudaBVHNode *node, const Color& c) const;
+  __device__ void draw(const CudaColor& c) const { }
+  __device__ void draw(CudaBVHNode *node, const CudaColor& c) const;
 
   /**
    * Draw the BVH outline with OpenGL - used in visualizer
    */
-  __device__ void drawOutline(const Color& c) const { }
-  __device__ void drawOutline(CudaBVHNode *node, const Color& c) const;
+  __device__ void drawOutline(const CudaColor& c) const { }
+  __device__ void drawOutline(CudaBVHNode *node, const CudaColor& c) const;
 
   mutable unsigned long long total_rays, total_isects;
  private:

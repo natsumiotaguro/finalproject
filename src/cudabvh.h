@@ -3,7 +3,9 @@
 
 #include "static_scene/scene.h"
 #include "static_scene/cudaAggregate.h"
+#include "static_scene/cudaPrimitive.h"
 #include "cudaIntersection.h"
+#include "cudaColor.h"
 #include <vector>
 namespace StaticScene {
 
@@ -54,7 +56,7 @@ struct CudaBVHNode {
 class CudaBVHAccel : public CudaAggregate {
  public:
 
-  __device__ CudaBVHAccel () { }
+  __device__ CudaBVHAccel() { }
 
   /**
    * Parameterized Constructor.

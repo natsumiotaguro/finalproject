@@ -20,7 +20,7 @@ class CudaPrimitive {
    * Get the world space bounding box of the primitive.
    * \return world space bounding box of the primitive
    */
-  virtual CudaBBox get_bbox() const = 0;
+  __device__ virtual CudaBBox get_bbox() const = 0;
 
   /**
    * Ray - Primitive intersection.
@@ -30,7 +30,7 @@ class CudaPrimitive {
    * \return true if the given ray intersects with the primitive,
              false otherwise
    */
-  virtual bool intersect(const CudaRay& r) const = 0;
+  __device__ virtual bool intersect(const CudaRay& r) const = 0;
 
   /**
    * Ray - Primitive intersection 2.
@@ -42,7 +42,7 @@ class CudaPrimitive {
    * \return true if the given ray intersects with the primitive,
              false otherwise
    */
-  virtual bool intersect(const CudaRay& r, CudaIntersection* i) const = 0;
+  __device__ virtual bool intersect(const CudaRay& r, CudaIntersection* i) const = 0;
 
   /**
    * Get BSDF.
@@ -50,19 +50,19 @@ class CudaPrimitive {
    * Note that the BSDFs are not stored in each primitive but in the
    * SceneObject the primitive belongs to.
    */
-  virtual CudaBSDF* get_bsdf() const = 0;
+  __device__ virtual CudaBSDF* get_bsdf() const = 0;
 
   /**
    * Draw with OpenGL (for visualization)
    * \param c desired highlight color
    */
-  virtual void draw(const CudaColor& c) const = 0;
+  __device__ virtual void draw(const CudaColor& c) const = 0;
 
   /**
    * Draw outline with OpenGL (for visualization)
    * \param c desired highlight color
    */
-  virtual void drawOutline(const CudaColor& c) const = 0;
+  __device__ virtual void drawOutline(const CudaColor& c) const = 0;
 
 };
 

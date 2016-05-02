@@ -2,6 +2,7 @@
 #define CGL_STATICSCENE_CUDAAGGREGATE_H
 
 #include "scene.h"
+#include "../cudabsdf.h"
 
 namespace StaticScene {
 
@@ -36,7 +37,7 @@ class CudaAggregate : public CudaPrimitive {
    * speed up ray - primitive intersections. Therefore get_brdf should always
    * return the null pointer for aggregates. 
    */
-  __device__ cudaBSDF* get_bsdf() const {
+  __device__ CudaBSDF* get_bsdf() const {
     return NULL;
   }
 

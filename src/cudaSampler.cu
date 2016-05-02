@@ -6,7 +6,7 @@
 
 __device__ CudaVector2D CudaUniformGridSampler2D::get_sample() const {
 
-  return CudaVector2D(random_uniform(), random_uniform());
+  return CudaVector2D(cuda_random_uniform(), cuda_random_uniform());
 
 }
 
@@ -14,8 +14,8 @@ __device__ CudaVector2D CudaUniformGridSampler2D::get_sample() const {
 
 __device__ CudaVector3D CudaUniformHemisphereSampler3D::get_sample() const {
 
-  double Xi1 = random_uniform();
-  double Xi2 = random_uniform();
+  double Xi1 = cuda_random_uniform();
+  double Xi2 = cuda_random_uniform();
 
   double theta = acos(Xi1);
   double phi = 2.0 * PI * Xi2;
@@ -35,8 +35,8 @@ __device__ CudaVector3D CudaCosineWeightedHemisphereSampler3D::get_sample() cons
 
 __device__ CudaVector3D CudaCosineWeightedHemisphereSampler3D::get_sample(float *pdf) const {
 
-  double Xi1 = random_uniform();
-  double Xi2 = random_uniform();
+  double Xi1 = cuda_random_uniform();
+  double Xi2 = cuda_random_uniform();
 
   double r = sqrt(Xi1);
   double theta = 2. * PI * Xi2;

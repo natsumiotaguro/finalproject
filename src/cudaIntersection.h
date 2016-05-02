@@ -10,8 +10,6 @@
 
 #define CUDA_D 0x7f800000
 
-namespace StaticScene {
-
 class CudaPrimitive;
 
 /**
@@ -37,6 +35,5 @@ struct CudaIntersection {
   // More to follow.
 };
 
-} // namespace StaticScene
 
 #endif // CGL_CUDAINTERSECT_H

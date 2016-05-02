@@ -14,7 +14,7 @@
 #include "cudaIntersection.h"
 
 #include "static_scene/cudaScene.h"
-
+#include "static_scene/scene.h"
 //#include "static_scene/environment_light.h"
 
 #include "image.h"
@@ -29,7 +29,7 @@ struct data_necessary{
 	Camera *camera;
 	size_t* max_ray_depth;
 	CudaSampler2D *gridSampler;
-	Scene* scene; 
+	CudaScene* scene; 
 };
 
 struct no_malloc_necessary{

@@ -127,7 +127,7 @@ __device__ CudaSpectrum CudaGlassBSDF::f(const CudaVector3D& wo, const CudaVecto
     double cos_wi = dot(wo, CudaVector3D(0, 0, 1));
     double r = cuda_clamp(r0 + (1 - r0)*(pow(1-cos_wi, 5)), 0, 1); //r0 + (1-R0)(1 - cos(theta_0))^5
     
-    double is_reflection = coin_flip(r);    //coin flip, decide reflection or refraction
+    double is_reflection = cuda_coin_flip(r);    //coin flip, decide reflection or refraction
     
     if(is_reflection == true){
       return r*reflectance/fabs(wi.z);
@@ -173,7 +173,7 @@ __device__ CudaSpectrum CudaGlassBSDF::sample_f(const CudaVector3D& wo, CudaVect
     //printf("sin 2 in the large %f\n", sin2);
     //printf("Cos i %f\n", cos_i);
     double r = cuda_clamp(r0 + (1 - r0)*(pow(1-cos_i, 5)), 0, 1); //r0 + (1-R0)(1 - cos(theta_0))^5
-    double is_reflection = coin_flip(r);    //coin flip, decide reflection or refraction
+    double is_reflection = cuda_coin_flip(r);    //coin flip, decide reflection or refraction
    
     //is_reflection = false; //TAKE IT OUT TAKE IT OUT TAKE IT OUT
     //r = 0.1;

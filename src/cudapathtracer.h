@@ -11,6 +11,7 @@
 #include "cudaVector3D.h"
 #include "cudaSpectrum.h"
 #include "cudaSampler.h"
+#include "cudaIntersection.h"
 
 #include "image.h"
 #include "camera.h"
@@ -54,8 +55,8 @@ void testblahlah();
 
 struct data_necessary* cudaMallocNecessary(struct data_necessary* host_data);
 __device__ CudaSpectrum trace_cuda_ray(const CudaRay &r, bool includeLe); 
-__device__ CudaSpectrum estimate_direct_lighting(const CudaRayRay& r, const CudaIntersection& isect); 
-__device__ CudaSpectrum estimate_indirect_lighting(const CudaRayRay& r, const CudaIntersection& isect); 
+__device__ CudaSpectrum estimate_direct_lighting(const CudaRay& r, const CudaIntersection& isect); 
+__device__ CudaSpectrum estimate_indirect_lighting(const CudaRay& r, const CudaIntersection& isect); 
 
 }
 

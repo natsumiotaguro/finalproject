@@ -1,7 +1,7 @@
 #ifndef CGL_STATICSCENE_CUDAAGGREGATE_H
 #define CGL_STATICSCENE_CUDAAGGREGATE_H
 
-#include "scene.h"
+#include "cudaScene.h"
 #include "../cudabsdf.h"
 
 namespace StaticScene {

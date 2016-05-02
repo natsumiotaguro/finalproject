@@ -622,8 +622,9 @@ void PathTracer::worker_thread() {
   WorkItem work;
   while (continueRaytracing && workQueue.try_get_work(&work)) {
     if (use_gpu) {
-      raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, &sampleBuffer,
-                        imageTileSize, &tile_samples, &frameBuffer);
+      host_data_necessary *data = fillNecessaryCudaData();
+      no_malloc_necessary *no_data = fillNoMallocData();
+      raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, *data, *no_data);
     } else {
       raytrace_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h);
     }

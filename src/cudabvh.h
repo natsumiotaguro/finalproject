@@ -3,7 +3,7 @@
 
 #include "static_scene/scene.h"
 #include "static_scene/cudaAggregate.h"
-
+#include "cudaIntersection.h"
 #include <vector>
 namespace StaticScene {
 

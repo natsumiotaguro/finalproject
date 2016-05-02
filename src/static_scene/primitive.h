@@ -65,58 +65,6 @@ class Primitive {
 
 };
 
-class CudaPrimitive {
- public:
-
-  /**
-   * Get the world space bounding box of the primitive.
-   * \return world space bounding box of the primitive
-   */
-  __device__ virtual CudaBBox get_bbox() const = 0;
-
-  /**
-   * Ray - Primitive intersection.
-   * Check if the given ray intersects with the primitive, no intersection
-   * information is stored.
-   * \param r ray to test intersection with
-   * \return true if the given ray intersects with the primitive,
-             false otherwise
-   */
-  __device__ virtual bool intersect(const Ray& r) const = 0;
-
-  /**
-   * Ray - Primitive intersection 2.
-   * Check if the given ray intersects with the primitive, if so, the input
-   * intersection data is updated to contain intersection information for the
-   * point of intersection.
-   * \param r ray to test intersection with
-   * \param i address to store intersection info
-   * \return true if the given ray intersects with the primitive,
-             false otherwise
-   */
-  __device__ virtual bool intersect(const Ray& r, Intersection* i) const = 0;
-
-  /**
-   * Get BSDF.
-   * Return the BSDF of the surface material of the primitive.
-   * Note that the BSDFs are not stored in each primitive but in the
-   * SceneObject the primitive belongs to.
-   */
-  __device__ virtual BSDF* get_bsdf() const = 0;
-
-  /**
-   * Draw with OpenGL (for visualization)
-   * \param c desired highlight color
-   */
-  __device__ virtual void draw(const Color& c) const = 0;
-
-  /**
-   * Draw outline with OpenGL (for visualization)
-   * \param c desired highlight color
-   */
-  __device__ virtual void drawOutline(const Color& c) const = 0;
-
-};
 
 
 } // namespace StaticScene

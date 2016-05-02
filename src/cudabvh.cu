@@ -1,7 +1,7 @@
 #include "cudabvh.h"
 
 //#include "CGL/CGL.h"
-#include "static_scene/triangle.h"
+//#include "static_scene/triangle.h"
 
 #include <iostream>
 #include <stack>
@@ -45,7 +45,7 @@ __device__ void CudaBVHAccel::drawOutline(CudaBVHNode *node, const Color& c) con
   }
 }
 
-__device__ CudaBVHNode *CudaBVHAccel::construct_bvh(const std::vector<Primitive*>& prims, size_t max_leaf_size) {
+__device__ CudaBVHNode *CudaBVHAccel::construct_bvh(const std::vector<CudaPrimitive*>& prims, size_t max_leaf_size) {
   
   // TODO Part 2, task 1:
   // Construct a BVH from the given vector of primitives and maximum leaf
@@ -66,12 +66,12 @@ __device__ CudaBVHNode *CudaBVHAccel::construct_bvh(const std::vector<Primitive*
   // You'll want to adjust this code.
   // Right now we just return a single node containing all primitives.
   CudaBVHNode *node = new CudaBVHNode(bbox);
-  node->prims = new vector<Primitive *>(prims);
+  node->prims = new vector<CudaPrimitive *>(prims);
 
   if(node->prims->size() > max_leaf_size){
     //Recurse left and right
-    vector<Primitive *> left;
-    vector<Primitive *> right;
+    vector<CudaPrimitive *> left;
+    vector<CudaPrimitive *> right;
     float divider = 0.5;
     float fail_count = 0; //If axis fails, we try a different axis
     while(fail_count < 3 && (left.empty() == true || right.empty() == true)){
@@ -156,7 +156,7 @@ __device__ bool CudaBVHAccel::intersect(const CudaRay& ray, CudaBVHNode *node) c
 
     if(node->isLeaf()){
       //
-      for (Primitive *p : *(node->prims)) {
+      for (CudaPrimitive *p : *(node->prims)) {
         if (p->intersect(ray)){
          return true;
         }

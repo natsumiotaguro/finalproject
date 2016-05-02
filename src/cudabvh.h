@@ -40,7 +40,7 @@ struct CudaBVHNode {
   CudaBBox bb;        ///< bounding box of the node
   CudaBVHNode* l;     ///< left child node
   CudaBVHNode* r;     ///< right child node
-  std::vector<Primitive *> *prims;
+  std::vector<CudaPrimitive *> *prims;
 
 };
 
@@ -64,7 +64,7 @@ class CudaBVHAccel : public CudaAggregate {
    * \param primitives primitives to build from
    * \param max_leaf_size maximum number of primitives to be stored in leaves
    */
-  __device__ CudaBVHAccel(const std::vector<Primitive*>& primitives, size_t max_leaf_size = 4);
+  __device__ CudaBVHAccel(const std::vector<CudaPrimitive*>& primitives, size_t max_leaf_size = 4);
 
   /**
    * Destructor.
@@ -142,7 +142,7 @@ class CudaBVHAccel : public CudaAggregate {
   mutable unsigned long long total_rays, total_isects;
  private:
   CudaBVHNode* root; ///< root node of the BVH
-  __device__ CudaBVHNode *construct_bvh(const std::vector<Primitive*>& prims, size_t max_leaf_size);
+  __device__ CudaBVHNode *construct_bvh(const std::vector<CudaPrimitive*>& prims, size_t max_leaf_size);
 };
 
 } // namespace StaticScene

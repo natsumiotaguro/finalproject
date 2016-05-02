@@ -244,8 +244,8 @@ void testblahlah() {
 
 __device__ Spectrum trace_cuda_ray(const CudaRay &r, bool includeLe) {
 
-  Intersection isect;
-  Spectrum L_out;
+  CudaIntersection isect;
+  CudaSpectrum L_out;
 
   // You will extend this in part 2. 
   // If no intersection occurs, we simply return black.

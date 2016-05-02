@@ -43,7 +43,7 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
 void testblahlah();
 
 void cudaMallocNecessary(struct data_necessary* host_data);
-
+__device__ Spectrum trace_cuda_ray(const CudaRay &r, bool includeLe);
 
 
 #endif // CUDA_PATHTRACER_H

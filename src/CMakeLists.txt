@@ -43,6 +43,8 @@ set(APPLICATION_SOURCE
     cudaMatrix3x3.cu
     cudaSampler.cu
     cudabsdf.cu
+    cudabbox.cu
+    cudabvh.cu
     camera.cu
     # cudapathtracer.cu
 

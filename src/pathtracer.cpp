@@ -214,11 +214,20 @@ void PathTracer::start_raytracing() {
   }
 
   bvh->total_isects = 0; bvh->total_rays = 0;
+  
+  //struct host_data_necessary* host = fillNecessaryCudaData();
+  //struct no_malloc_necessary* none_host = fillNoMallocData();
+
+
+
+  //raytrace_cuda_tile(0, 0, sampleBuffer.w, sampleBuffer.h, host, none_host, &sampleBuffer);
+  
   // launch threads
   fprintf(stdout, "[PathTracer] Rendering... "); fflush(stdout);
   for (int i=0; i<numWorkerThreads; i++) {
       workerThreads[i] = new std::thread(&PathTracer::worker_thread, this);
   }
+  
 }
 
 void PathTracer::render_to_file(string filename) {
@@ -573,7 +582,7 @@ struct host_data_necessary* PathTracer::fillNecessaryCudaData(){
   cuda_data->bvh = bvh;  
   cuda_data->primitivesArr = primitivesArr;
 
-
+  return cuda_data;
 }
 
 struct no_malloc_necessary* PathTracer::fillNoMallocData(){
@@ -582,6 +591,7 @@ struct no_malloc_necessary* PathTracer::fillNoMallocData(){
   no_mall->tile_samples = &tile_samples; 
   no_mall->frameBuffer = &frameBuffer;
 
+  return no_mall;
 }
 
 void PathTracer::raytrace_tile(int tile_x, int tile_y,
@@ -624,7 +634,7 @@ void PathTracer::worker_thread() {
     if (use_gpu) {
       host_data_necessary *data = fillNecessaryCudaData();
       no_malloc_necessary *no_data = fillNoMallocData();
-      raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, data, no_data);
+      raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, data, no_data, &sampleBuffer);
     } else {
       raytrace_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h);
     }
@@ -635,7 +645,6 @@ void PathTracer::worker_thread() {
       cout.flush();
     }
   }
-
   workerDoneCount++;
   if (!continueRaytracing && workerDoneCount == numWorkerThreads) {
     timer.stop();
@@ -653,6 +662,7 @@ void PathTracer::worker_thread() {
     state = DONE;
     cv_done.notify_one();
   }
+  printf("wah\n");
 }
 
 void PathTracer::save_image(string filename) {

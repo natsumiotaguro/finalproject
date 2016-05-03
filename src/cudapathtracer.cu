@@ -6,15 +6,14 @@ namespace CGL {
 */
 __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp,  struct data_necessary* cuda_data){
     int i = threadIdx.x + blockIdx.x * blockDim.x;
-    sp[i].r = 0.30;
+    sp[i].r = 0.20;
     sp[i].g = 0.40;
-    sp[i].b = 0.050;
-
+    sp[i].b = 0.080;
 
   // Part 1, Task 1:
   // Make a loop that generates num_samples camera rays and traces them 
   // through the scene. Return the average Spectrum. 
-
+/*
   int num_samples = *cuda_data->ns_aa; // total samples to evaluate
   HDRImageBuffer* sampleBuffer = cuda_data->sampleBuffer;
   Camera* camera = cuda_data->camera;
@@ -32,7 +31,7 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp,  
     sampler = cuda_data->gridSampler->get_sample(); //For next iteration
     
   }
-
+*/
 
 
 
@@ -44,6 +43,7 @@ __global__ void instantiate_Necesary(struct data_necessary* data){
 
 //Returns struct with all CUDA pointers
 struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
+	printf("Starting cudaMalloc\n");
     struct data_necessary* cuda_data;
     cudaMalloc((void **) &cuda_data, sizeof(struct data_necessary));
 
@@ -71,22 +71,21 @@ struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
     cudaMalloc((void **) &gridSampler, sizeof(CudaSampler2D));
     cudaMemcpy(gridSampler, data->gridSampler, sizeof(CudaSampler2D), cudaMemcpyHostToDevice);
     cuda_data->gridSampler = gridSampler;
-
+    printf("Ending cudaMalloc\n");
     
     return cuda_data;
 }
 
 
 void raytrace_cuda_tile(int tile_x, int tile_y,
-                                int tile_w, int tile_h, struct host_data_necessary *data, struct no_malloc_necessary *no_data) {
+                                int tile_w, int tile_h, struct host_data_necessary *data, struct no_malloc_necessary *no_data, HDRImageBuffer *sampleBuffer) {
 
-    struct data_necessary* cuda_data = cudaMallocNecessary(data);
-
-    size_t w = cuda_data->sampleBuffer->w;
-    size_t h = cuda_data->sampleBuffer->h;
+    struct data_necessary* cuda_data;// = cudaMallocNecessary(data);
+    
+    size_t w = data->sampleBuffer->w;
+    size_t h = data->sampleBuffer->h;
 
     size_t num_tiles_w = w / no_data->imageTileSize + 1;
-
     size_t tile_start_x = tile_x;
     size_t tile_start_y = tile_y;
 
@@ -96,10 +95,7 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
     size_t tile_idx_x = tile_x / no_data->imageTileSize;
     size_t tile_idx_y = tile_y / no_data->imageTileSize;
     size_t num_samples_tile = (*no_data->tile_samples)[tile_idx_x + tile_idx_y * num_tiles_w];
-
-    size_t *host_x, *host_y;
-    size_t *dev_x, *dev_y;
-    Spectrum *dev_sp;
+    
 
     size_t tile_length_x = tile_end_x - tile_start_x;
     size_t tile_length_y = tile_end_y - tile_start_y;
@@ -107,15 +103,19 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
     int x_len = sizeof(size_t) * tile_length_x;
     int y_len = sizeof(size_t) * tile_length_y;
 
-    host_x = (size_t *)malloc(x_len);
-    host_y = (size_t *)malloc(y_len);
+    size_t *host_x = (size_t *)malloc(x_len);
+    size_t *host_y = (size_t *)malloc(y_len);
+    size_t *dev_x, *dev_y;
+    Spectrum *dev_sp;
 
+    printf("tres\n");
     for (size_t y = 0; y < tile_length_y; y++) {
         host_y[y] = tile_start_y + y;
     }
     for (size_t x = 0; x < tile_length_x; x++) {
         host_x[x] = tile_start_x + x;
     }
+
 
     //cudamalloc x, y, spectrum
     cudaMalloc((void **) &dev_x, x_len);
@@ -131,17 +131,20 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
 
     //Call helper
     cudaSetDevice(1);
+    
     raytrace_cuda_pixel_helper<<<N,M>>>(dev_x, dev_y, dev_sp, cuda_data);
     cudaDeviceSynchronize();
+    cudaThreadSynchronize();
     //Copy Result
     Spectrum *result = (Spectrum *)malloc(sizeof(Spectrum) * tile_length_x * tile_length_y);
 
     cudaMemcpy(result, dev_sp, (sizeof(Spectrum) * tile_length_x * tile_length_y), cudaMemcpyDeviceToHost);
-    
     for (size_t x = 0; x < tile_length_x; x++) {
         //if (!continueRaytracing) return;
         for (size_t y = 0; y < tile_length_y; y++) {
-            data->sampleBuffer->update_pixel(result[x * tile_length_x + y], tile_start_x + x, tile_start_y + y);
+        	//std::cout << "result:" << result[x * tile_length_x + y] << "\n";
+        	//result[x*tile_length_x + y] = Spectrum(0.5, 0.2, 0.3);
+            sampleBuffer->update_pixel(result[x * tile_length_x + y], tile_start_x + x, tile_start_y + y);
         }
     }
    
@@ -150,15 +153,18 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
     cudaFree(dev_x);
     cudaFree(dev_y);
     cudaFree(dev_sp);
+    //Free insides of cuda_data?
+    cudaFree(cuda_data);
     free(host_x);
     free(host_y);
     free(result);
 
     (*no_data->tile_samples)[tile_idx_x + tile_idx_y * num_tiles_w] += 1;
     data->sampleBuffer->toColor(*no_data->frameBuffer, tile_start_x, tile_start_y, tile_end_x, tile_end_y);
-    }
+   
+}
 
-      int nDevices;
+
 
 void testblahlah() {
   int nDevices;
@@ -187,7 +193,7 @@ __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_
 
   CudaIntersection isect;
   CudaSpectrum L_out;
-
+  printf("hai\n");
   // You will extend this in part 2. 
   // If no intersection occurs, we simply return black.
   // This changes if you implement hemispherical lighting for extra credit.

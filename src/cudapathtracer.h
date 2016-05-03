@@ -68,9 +68,9 @@ struct no_malloc_necessary{
 	// size_t* imageTileSize;
 	// vector<int> *tile_samples;
 	// ImageBuffer *frameBuffer
-size_t cuda_ns_aa;
-HDRImageBuffer* cuda_sampleBuffer;
-Camera* cuda_c;
+//extern size_t* cuda_ns_aa;
+//extern HDRImageBuffer* cuda_sampleBuffer;
+//extern Camera* cuda_c;
 
 void raytrace_cuda_tile(int tile_x, int tile_y,
                                 int tile_w, int tile_h, HDRImageBuffer *sampleBuffer,
@@ -78,6 +78,12 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
                                 ImageBuffer *frameBuffer, struct host_data_necessary *data);
 
 void testblahlah();
+
+//camera
+__device__ CudaRay path_cuda_generate_ray(double x, double y);
+
+
+
 
 struct data_necessary* cudaMallocNecessary(struct host_data_necessary* host_data);
 void cudaFreeNecessary(struct data_necessary* cuda_data);

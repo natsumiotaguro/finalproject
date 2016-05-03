@@ -225,11 +225,11 @@ void PathTracer::start_raytracing() {
   // launch threads
   fprintf(stdout, "[PathTracer] Rendering... "); fflush(stdout);
 
-  
 
 
 
-  
+
+
   for (int i=0; i<numWorkerThreads; i++) {
       workerThreads[i] = new std::thread(&PathTracer::worker_thread, this);
   }
@@ -637,7 +637,7 @@ void PathTracer::worker_thread() {
   WorkItem work;
   while (continueRaytracing && workQueue.try_get_work(&work)) {
     if (use_gpu) {
-      //host_data_necessary *data = fillNecessaryCudaData();
+      host_data_necessary *data = fillNecessaryCudaData();
       //no_malloc_necessary *no_data = fillNoMallocData();
       //raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, data, no_data, &sampleBuffer);
       raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, &sampleBuffer,

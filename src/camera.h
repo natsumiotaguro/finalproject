@@ -89,7 +89,7 @@ class Camera {
    */
   Ray generate_ray(double x, double y) const;
 
-  __device__ CudaRay cuda_generate_ray(double x, double y) const;
+  __device__ CudaRay cuda_generate_ray(double x, double y);
  
  private:
   // Computes pos, screenXDir, screenYDir from target, r, phi, theta.

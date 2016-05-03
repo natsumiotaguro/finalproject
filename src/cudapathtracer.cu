@@ -4,24 +4,34 @@ namespace CGL {
 *   
 *
 */
-__global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp){
+__global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp, struct data_necessary* cuda_data){
     int i = threadIdx.x + blockIdx.x * blockDim.x;
     sp[i].r = 0.20;
     sp[i].g = 0.40;
     sp[i].b = 0.080;
 
+  	int num_samples = *cuda_data->ns_aa; // total samples to evaluate
+	HDRImageBuffer* sampleBuffer = cuda_data->sampleBuffer;
+  	Camera* camera = cuda_data->camera;
+  	
+  	CudaVector2D origin = CudaVector2D(*x,*y); // bottom left corner of the pixel
+  	CudaSpectrum average = CudaSpectrum();
+  //Loop, for number of samples, get the color
+  	CudaVector2D sampler = CudaVector2D(0.5, 0.5); //First pixel is always 0.5
+
+  	for(int i = 0; i < num_samples; i++){
+	    CudaVector2D point = CudaVector2D(((double)*x + sampler.x)/sampleBuffer->w, ((double)*y + sampler.y)/sampleBuffer->h);
+	    CudaRay r = path_cuda_generate_ray(point.x, point.y);
+	    r.depth = *cuda_data->max_ray_depth;
+	    //average += trace_cuda_ray(r, true, cuda_data);
+
+	    //sampler = cuda_data->gridSampler->get_sample(); //For next iteration
+	    
+  }
   // Part 1, Task 1:
   // Make a loop that generates num_samples camera rays and traces them 
   // through the scene. Return the average Spectrum. 
 /*
-  int num_samples = *cuda_data->ns_aa; // total samples to evaluate
-  HDRImageBuffer* sampleBuffer = cuda_data->sampleBuffer;
-  Camera* camera = cuda_data->camera;
-
-  CudaVector2D origin = CudaVector2D(*x,*y); // bottom left corner of the pixel
-  CudaSpectrum average = CudaSpectrum();
-  //Loop, for number of samples, get the color
-  CudaVector2D sampler = CudaVector2D(0.5, 0.5); //First pixel is always 0.5
   for(int i = 0; i < num_samples; i++){
     CudaVector2D point = CudaVector2D(((double)*x + sampler.x)/sampleBuffer->w, ((double)*y + sampler.y)/sampleBuffer->h);
     CudaRay r = camera->cuda_generate_ray(point.x, point.y);
@@ -33,7 +43,45 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp){
   }
 */
 
+}
 
+//Originally from ccamera.cpp
+__device__ CudaRay path_cuda_generate_ray(double x, double y){
+  // Part 1, Task 2:
+  // compute position of the input sensor sample coordinate on the
+  // canonical sensor plane one unit away from the pinhole.
+  // Note: hFov and vFov are in degrees.
+  // 
+  /*
+  double hFovRad = *cudahFov * (PI / 180);
+  double vFovRad = *cudavFov * (PI / 180);
+  CudaVector3D lower_left  = CudaVector3D(-tan(hFovRad*.5), -tan(vFovRad*.5),-1);
+  CudaVector3D upper_right = CudaVector3D( tan(hFovRad*.5),  tan(vFovRad*.5),-1);
+  CudaVector3D direction = CudaVector3D(lower_left.x + x*(upper_right.x - lower_left.x), 
+                                 lower_left.y + y*(upper_right.y - lower_left.y),
+                                    -1 );
+  direction = *cudac2w*direction;
+  direction.normalize();
+  
+  CudaRay my_ray = CudaRay(*cudaPos, direction);
+  my_ray.min_t = *cudaNClip;
+  my_ray.max_t = *cudaFClip;
+  */
+  return CudaRay(CudaVector3D(0, 0, 0), CudaVector3D(0, 0, 0)); //my_ray;
+
+
+}
+
+
+void cudaMemcpy(size_t* ns_aa, HDRImageBuffer* sampleBuffer, Camera* c){
+	// cudaMalloc((void **) &cuda_ns_aa, sizeof(size_t));
+ //    cudaMemcpy(cuda_ns_aa, ns_aa, sizeof(size_t), cudaMemcpyHostToDevice);
+
+ //    cudaMalloc((void **) &cuda_sampleBuffer, sizeof(HDRImageBuffer));
+ //    cudaMemcpy(cuda_sampleBuffer, sampleBuffer, sizeof(HDRImageBuffer), cudaMemcpyHostToDevice);
+
+ //    cudaMalloc((void **) &cuda_c, sizeof(Camera));
+ //    cudaMemcpy(cuda_c, c, sizeof(Camera), cudaMemcpyHostToDevice);
 
 }
 
@@ -44,35 +92,37 @@ __global__ void instantiate_Necesary(struct data_necessary* data){
 //Returns struct with all CUDA pointers
 struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
 	printf("Starting cudaMalloc\n");
+    struct data_necessary* host_data = (struct data_necessary*) malloc(sizeof(struct data_necessary));
     struct data_necessary* cuda_data;
     cudaMalloc((void **) &cuda_data, sizeof(struct data_necessary));
 
     size_t* ns_aa;
     cudaMalloc((void **) &ns_aa, sizeof(size_t));
     cudaMemcpy(ns_aa, data->ns_aa, sizeof(size_t), cudaMemcpyHostToDevice);
-    cuda_data->ns_aa = ns_aa;
+    host_data->ns_aa = ns_aa;
 
     HDRImageBuffer *sampleBuffer;
     cudaMalloc((void **) &sampleBuffer, sizeof(HDRImageBuffer));
     cudaMemcpy(sampleBuffer, data->sampleBuffer, sizeof(HDRImageBuffer), cudaMemcpyHostToDevice);
-    cuda_data->sampleBuffer = sampleBuffer;
+    host_data->sampleBuffer = sampleBuffer;
 
     Camera *camera;
     cudaMalloc((void **) &camera, sizeof(Camera));
     cudaMemcpy(camera, data->camera, sizeof(Camera), cudaMemcpyHostToDevice);
-    cuda_data->camera = camera;
+    host_data->camera = camera;
 
     size_t* max_ray_depth;
     cudaMalloc((void **) &max_ray_depth, sizeof(size_t));
     cudaMemcpy(max_ray_depth, data->max_ray_depth, sizeof(size_t), cudaMemcpyHostToDevice);
-    cuda_data->max_ray_depth = max_ray_depth;
+    host_data->max_ray_depth = max_ray_depth;
 
     CudaSampler2D *gridSampler;
     cudaMalloc((void **) &gridSampler, sizeof(CudaSampler2D));
     cudaMemcpy(gridSampler, data->gridSampler, sizeof(CudaSampler2D), cudaMemcpyHostToDevice);
-    cuda_data->gridSampler = gridSampler;
+    host_data->gridSampler = gridSampler;
     printf("Ending cudaMalloc\n");
     
+    cudaMemcpy(cuda_data, host_data, sizeof(struct data_necessary), cudaMemcpyHostToDevice);
     return cuda_data;
 }
 
@@ -97,7 +147,7 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
                                 size_t imageTileSize, vector<int> *tile_samples,
                                 ImageBuffer *frameBuffer, struct host_data_necessary *data) {
 
-    struct data_necessary* cuda_data;// = cudaMallocNecessary(data);
+    struct data_necessary* cuda_data = cudaMallocNecessary(data);
     
     cudaError_t err = cudaSetDevice(0);
     if(err != cudaSuccess){
@@ -148,7 +198,7 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
     int M = tile_length_y;
 
     //Call helper
-    raytrace_cuda_pixel_helper<<<N,M>>>(dev_x, dev_y, dev_sp);
+    raytrace_cuda_pixel_helper<<<N,M>>>(dev_x, dev_y, dev_sp, cuda_data);
     cudaDeviceSynchronize();
     //Copy Result
     Spectrum *result = (Spectrum *)malloc(sizeof(Spectrum) * tile_length_x * tile_length_y);

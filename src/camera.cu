@@ -158,14 +158,15 @@ Ray Camera::generate_ray(double x, double y) const {
   return my_ray;
 
 }
-/*
-__device__ CudaRay Camera::cuda_generate_ray(double x, double y) const {
+
+__device__ CudaRay Camera::cuda_generate_ray(double x, double y) {
 
   // Part 1, Task 2:
   // compute position of the input sensor sample coordinate on the
   // canonical sensor plane one unit away from the pinhole.
   // Note: hFov and vFov are in degrees.
   // 
+  /*
   double hFovRad = *cudahFov * (PI / 180);
   double vFovRad = *cudavFov * (PI / 180);
   CudaVector3D lower_left  = CudaVector3D(-tan(hFovRad*.5), -tan(vFovRad*.5),-1);
@@ -179,10 +180,11 @@ __device__ CudaRay Camera::cuda_generate_ray(double x, double y) const {
   CudaRay my_ray = CudaRay(*cudaPos, direction);
   my_ray.min_t = *cudaNClip;
   my_ray.max_t = *cudaFClip;
-  return my_ray;
+  */
+  return CudaRay(CudaVector3D(0, 0, 0), CudaVector3D(0, 0, 0)); //my_ray;
 
 }
-*/
+
 
 
 

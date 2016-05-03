@@ -76,14 +76,33 @@ struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
     return cuda_data;
 }
 
+void cudaFreeNecessary(struct data_necessary* cuda_data){
+printf("Starting cudaMalloc\n");
+    
+    cudaFree(cuda_data->ns_aa);
 
+    cudaFree(cuda_data->sampleBuffer);
+
+    cudaFree(cuda_data->camera);
+
+    cudaFree(cuda_data->max_ray_depth);
+
+    cudaFree(cuda_data->gridSampler);
+    printf("Ending cudaMalloc\n");
+ 
+    cudaFree(cuda_data);
+}
 void raytrace_cuda_tile(int tile_x, int tile_y,
                                 int tile_w, int tile_h, HDRImageBuffer *sampleBuffer,
                                 size_t imageTileSize, vector<int> *tile_samples,
-                                ImageBuffer *frameBuffer) {
+                                ImageBuffer *frameBuffer, struct host_data_necessary *data) {
 
-    //struct data_necessary* cuda_data;// = cudaMallocNecessary(data);
+    struct data_necessary* cuda_data;// = cudaMallocNecessary(data);
     
+    cudaError_t err = cudaSetDevice(0);
+    if(err != cudaSuccess){
+    	printf("err not success\n");
+    }
 	size_t w = sampleBuffer->w;
     size_t h = sampleBuffer->h;
 
@@ -129,7 +148,6 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
     int M = tile_length_y;
 
     //Call helper
-    cudaSetDevice(1);
     raytrace_cuda_pixel_helper<<<N,M>>>(dev_x, dev_y, dev_sp);
     cudaDeviceSynchronize();
     //Copy Result
@@ -146,10 +164,13 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
    
 
     //Cleanup - DON'T FORGET TO UN-MALLOC FREE IT
+    free(host_x);
+    free(host_y);
+    free(result);
     cudaFree(dev_x);
     cudaFree(dev_y);
     cudaFree(dev_sp);
-
+   // cudaFreeNecessary(cuda_data);
 
     (*tile_samples)[tile_idx_x + tile_idx_y * num_tiles_w] += 1;
     sampleBuffer->toColor(*frameBuffer, tile_start_x, tile_start_y, tile_end_x, tile_end_y);
@@ -206,12 +227,12 @@ __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_
   // their values get accumulated through indirect lighting, where the BSDF 
   // gets to sample itself.
   if (!isect.bsdf->is_delta()) 
-    L_out += estimate_direct_lighting(r, isect, cuda_data);
+ //   L_out += estimate_direct_lighting(r, isect, cuda_data);
   // You will implement this in part 4.
   // If the ray's depth is zero, then the path must terminate
   // and no further indirect lighting is calculated.
   if (r.depth > 0)
-    L_out += estimate_indirect_lighting(r, isect, cuda_data);
+ //   L_out += estimate_indirect_lighting(r, isect, cuda_data);
   
   return L_out;
 
@@ -219,7 +240,7 @@ __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_
 __device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection& isect, struct data_necessary* cuda_data) {
 
 // TODO Part 3
-
+/*
   // make a coordinate system for a hit point
   // with N aligned with the Z direction.
   CudaMatrix3x3 o2w;
@@ -263,7 +284,8 @@ __device__ CudaSpectrum estimate_direct_lighting( CudaRay& r,  CudaIntersection&
     }
     L_out += sample_out/num_samples;
   }
-  return L_out;
+  */
+  return CudaSpectrum(0, 0, 0); //L_out;
 
 
 

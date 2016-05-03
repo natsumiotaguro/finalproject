@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 find_package(CUDA QUIET REQUIRED)
 
-SET(CUDA_SEPARABLE_COMPILATION ON)
+#SET(CUDA_SEPARABLE_COMPILATION ON)
 # Application source
 set(APPLICATION_SOURCE
 
@@ -41,10 +41,10 @@ set(APPLICATION_SOURCE
     cudaVector3D.cu
     cudaSpectrum.cu
     cudaMatrix3x3.cu
-    cudaSampler.cu
-    cudabsdf.cu
+    #cudaSampler.cu
+    #cudabsdf.cu
     cudabbox.cu
-    cudabvh.cu
+    #cudabvh.cu
     cudaColor.cu
     camera.cu
     cudapathtracer.cu
@@ -61,7 +61,7 @@ set(APPLICATION_SOURCE
 #-------------------------------------------------------------------------------
 # Compiler Flags
 #-------------------------------------------------------------------------------
-list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30; -rdc=true; -std=c++11; -O2;-DVERBOSE")
+list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30; -std=c++11; -O2;-DVERBOSE")
 
 #-------------------------------------------------------------------------------
 # Set include directories

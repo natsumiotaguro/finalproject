@@ -3,7 +3,7 @@
 
 #include "cudaVector3D.h"
 
-#include <iosfwd>
+//#include <iosfwd>
 
 
 /**

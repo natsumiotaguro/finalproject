@@ -3,8 +3,8 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <curand.h>
-#include <curand_kernel.h>
+//#include <curand.h>
+#//include <curand_kernel.h>
 #include "cudaVector2D.h"
 #include "cudaVector3D.h"
 #include "CGL/misc.h"

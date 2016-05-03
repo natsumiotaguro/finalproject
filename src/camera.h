@@ -96,10 +96,10 @@ class Camera {
   void compute_position();
   // Field of view aspect ratio, clipping planes.
   double hFov, vFov, ar, nClip, fClip;
-  double *cudahFov, *cudavFov, *cudaAR, *cudaNClip, *cudaFClip;
+  //double *cudahFov, *cudavFov, *cudaAR, *cudaNClip, *cudaFClip;
   // Current position and target point (the point the camera is looking at).
   Vector3D pos, targetPos;
-  CudaVector3D *cudaPos, *cudaTargetPos;
+  //CudaVector3D *cudaPos, *cudaTargetPos;
   // Orientation relative to target, and min & max distance from the target.
   double phi, theta, r, minR, maxR;
 
@@ -107,7 +107,7 @@ class Camera {
   // camera-space point by 'pos' to perform a full camera-to-world
   // transform)
   Matrix3x3 c2w;
-  CudaMatrix3x3* cudac2w;
+  //CudaMatrix3x3* cudac2w;
   // Info about screen to render to; it corresponds to the camera's full field
   // of view at some distance.
   size_t screenW, screenH;

@@ -586,8 +586,8 @@ struct host_data_necessary* PathTracer::fillNecessaryCudaData(){
 }
 
 struct no_malloc_necessary* PathTracer::fillNoMallocData(){
-  struct no_malloc_necessary *no_mall;
-  no_mall->imageTileSize = imageTileSize;
+  struct no_malloc_necessary *no_mall = (struct no_malloc_necessary *) malloc(sizeof(struct no_malloc_necessary));
+  no_mall->imageTileSize = &imageTileSize;
   no_mall->tile_samples = &tile_samples; 
   no_mall->frameBuffer = &frameBuffer;
 
@@ -599,7 +599,6 @@ void PathTracer::raytrace_tile(int tile_x, int tile_y,
 
   size_t w = sampleBuffer.w;
   size_t h = sampleBuffer.h;
-
   size_t tile_start_x = tile_x;
   size_t tile_start_y = tile_y;
 
@@ -609,7 +608,7 @@ void PathTracer::raytrace_tile(int tile_x, int tile_y,
   size_t tile_idx_x = tile_x / imageTileSize;
   size_t tile_idx_y = tile_y / imageTileSize;
   size_t num_samples_tile = tile_samples[tile_idx_x + tile_idx_y * num_tiles_w];
-
+  printf("nuM_samples_tile: %d\n", num_samples_tile);
   for (size_t y = tile_start_y; y < tile_end_y; y++) {
     if (!continueRaytracing) return;
     for (size_t x = tile_start_x; x < tile_end_x; x++) {
@@ -627,14 +626,16 @@ void PathTracer::worker_thread() {
 
   Timer timer;
   timer.start();
-  testblahlah();
+  //testblahlah();
 
   WorkItem work;
   while (continueRaytracing && workQueue.try_get_work(&work)) {
     if (use_gpu) {
-      host_data_necessary *data = fillNecessaryCudaData();
-      no_malloc_necessary *no_data = fillNoMallocData();
-      raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, data, no_data, &sampleBuffer);
+      //host_data_necessary *data = fillNecessaryCudaData();
+      //no_malloc_necessary *no_data = fillNoMallocData();
+      //raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, data, no_data, &sampleBuffer);
+      raytrace_cuda_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h, &sampleBuffer,
+                        imageTileSize, &tile_samples, &frameBuffer);
     } else {
       raytrace_tile(work.tile_x, work.tile_y, work.tile_w, work.tile_h);
     }

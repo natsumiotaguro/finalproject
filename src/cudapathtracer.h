@@ -55,7 +55,7 @@ struct host_data_necessary{
 
 struct no_malloc_necessary{
 
-	size_t imageTileSize;
+	size_t *imageTileSize;
 	vector<int> *tile_samples;
 	ImageBuffer *frameBuffer;
 };
@@ -71,10 +71,9 @@ struct no_malloc_necessary{
 
 
 void raytrace_cuda_tile(int tile_x, int tile_y,
-                        int tile_w, int tile_h, 
-                        struct host_data_necessary *data, 
-                        struct no_malloc_necessary *no_data,
-                        HDRImageBuffer *sampleBuffer);
+                                int tile_w, int tile_h, HDRImageBuffer *sampleBuffer,
+                                size_t imageTileSize, vector<int> *tile_samples,
+                                ImageBuffer *frameBuffer);
 
 void testblahlah();
 

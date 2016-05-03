@@ -4,7 +4,7 @@ namespace CGL {
 *   
 *
 */
-__global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp,  struct data_necessary* cuda_data){
+__global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp){
     int i = threadIdx.x + blockIdx.x * blockDim.x;
     sp[i].r = 0.20;
     sp[i].g = 0.40;
@@ -78,37 +78,37 @@ struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
 
 
 void raytrace_cuda_tile(int tile_x, int tile_y,
-                                int tile_w, int tile_h, struct host_data_necessary *data, struct no_malloc_necessary *no_data, HDRImageBuffer *sampleBuffer) {
+                                int tile_w, int tile_h, HDRImageBuffer *sampleBuffer,
+                                size_t imageTileSize, vector<int> *tile_samples,
+                                ImageBuffer *frameBuffer) {
 
-    struct data_necessary* cuda_data;// = cudaMallocNecessary(data);
+    //struct data_necessary* cuda_data;// = cudaMallocNecessary(data);
     
-    size_t w = data->sampleBuffer->w;
-    size_t h = data->sampleBuffer->h;
+	size_t w = sampleBuffer->w;
+    size_t h = sampleBuffer->h;
 
-    size_t num_tiles_w = w / no_data->imageTileSize + 1;
+    size_t num_tiles_w = w / imageTileSize + 1;
+
     size_t tile_start_x = tile_x;
     size_t tile_start_y = tile_y;
 
     size_t tile_end_x = std::min(tile_start_x + tile_w, w);
     size_t tile_end_y = std::min(tile_start_y + tile_h, h);
 
-    size_t tile_idx_x = tile_x / no_data->imageTileSize;
-    size_t tile_idx_y = tile_y / no_data->imageTileSize;
-    size_t num_samples_tile = (*no_data->tile_samples)[tile_idx_x + tile_idx_y * num_tiles_w];
-    
+    size_t tile_idx_x = tile_x / imageTileSize;
+    size_t tile_idx_y = tile_y / imageTileSize;
+    size_t num_samples_tile = (*tile_samples)[tile_idx_x + tile_idx_y * num_tiles_w];
+
+    size_t *host_x, *host_y;
+    size_t *dev_x, *dev_y;
+    Spectrum *dev_sp;
 
     size_t tile_length_x = tile_end_x - tile_start_x;
     size_t tile_length_y = tile_end_y - tile_start_y;
 
-    int x_len = sizeof(size_t) * tile_length_x;
-    int y_len = sizeof(size_t) * tile_length_y;
+    host_x = (size_t *)malloc(sizeof(size_t) * tile_length_x);
+    host_y = (size_t *)malloc(sizeof(size_t) * tile_length_y);
 
-    size_t *host_x = (size_t *)malloc(x_len);
-    size_t *host_y = (size_t *)malloc(y_len);
-    size_t *dev_x, *dev_y;
-    Spectrum *dev_sp;
-
-    printf("tres\n");
     for (size_t y = 0; y < tile_length_y; y++) {
         host_y[y] = tile_start_y + y;
     }
@@ -116,34 +116,30 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
         host_x[x] = tile_start_x + x;
     }
 
-
     //cudamalloc x, y, spectrum
-    cudaMalloc((void **) &dev_x, x_len);
-    cudaMalloc((void **) &dev_y, y_len);
+    cudaMalloc((void **) &dev_x, sizeof(size_t) * tile_length_x);
+    cudaMalloc((void **) &dev_y, sizeof(size_t) * tile_length_y);
     cudaMalloc((void **) &dev_sp, sizeof(Spectrum) * tile_length_x * tile_length_y);
 
     //cudaMemCpy
-    cudaMemcpy(dev_x, &host_x, x_len, cudaMemcpyHostToDevice);
-    cudaMemcpy(dev_y, &host_y, y_len, cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_x, &host_x, sizeof(size_t) * tile_length_x, cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_y, &host_y, sizeof(size_t) * tile_length_y, cudaMemcpyHostToDevice);
     
     int N = tile_length_x;
     int M = tile_length_y;
 
     //Call helper
     cudaSetDevice(1);
-    
-    raytrace_cuda_pixel_helper<<<N,M>>>(dev_x, dev_y, dev_sp, cuda_data);
+    raytrace_cuda_pixel_helper<<<N,M>>>(dev_x, dev_y, dev_sp);
     cudaDeviceSynchronize();
-    cudaThreadSynchronize();
     //Copy Result
     Spectrum *result = (Spectrum *)malloc(sizeof(Spectrum) * tile_length_x * tile_length_y);
 
     cudaMemcpy(result, dev_sp, (sizeof(Spectrum) * tile_length_x * tile_length_y), cudaMemcpyDeviceToHost);
+    
     for (size_t x = 0; x < tile_length_x; x++) {
         //if (!continueRaytracing) return;
         for (size_t y = 0; y < tile_length_y; y++) {
-        	//std::cout << "result:" << result[x * tile_length_x + y] << "\n";
-        	//result[x*tile_length_x + y] = Spectrum(0.5, 0.2, 0.3);
             sampleBuffer->update_pixel(result[x * tile_length_x + y], tile_start_x + x, tile_start_y + y);
         }
     }
@@ -153,15 +149,10 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
     cudaFree(dev_x);
     cudaFree(dev_y);
     cudaFree(dev_sp);
-    //Free insides of cuda_data?
-    cudaFree(cuda_data);
-    free(host_x);
-    free(host_y);
-    free(result);
 
-    (*no_data->tile_samples)[tile_idx_x + tile_idx_y * num_tiles_w] += 1;
-    data->sampleBuffer->toColor(*no_data->frameBuffer, tile_start_x, tile_start_y, tile_end_x, tile_end_y);
-   
+
+    (*tile_samples)[tile_idx_x + tile_idx_y * num_tiles_w] += 1;
+    sampleBuffer->toColor(*frameBuffer, tile_start_x, tile_start_y, tile_end_x, tile_end_y);
 }
 
 

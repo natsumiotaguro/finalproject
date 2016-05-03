@@ -61,7 +61,7 @@ set(APPLICATION_SOURCE
 #-------------------------------------------------------------------------------
 # Compiler Flags
 #-------------------------------------------------------------------------------
-list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30; -x cu; -rdc=true; -std=c++11; -O2;-DVERBOSE")
+list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30; -rdc=true; -std=c++11; -O2;-DVERBOSE")
 
 #-------------------------------------------------------------------------------
 # Set include directories

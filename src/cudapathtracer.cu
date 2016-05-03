@@ -23,7 +23,7 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp, s
 	    CudaVector2D point = CudaVector2D(((double)*x + sampler.x)/sampleBuffer->w, ((double)*y + sampler.y)/sampleBuffer->h);
 	    CudaRay r = path_cuda_generate_ray(point.x, point.y);
 	    r.depth = *cuda_data->max_ray_depth;
-	    //average += trace_cuda_ray(r, true, cuda_data);
+	    average += trace_cuda_ray(r, true, cuda_data);
 
 	    //sampler = cuda_data->gridSampler->get_sample(); //For next iteration
 	    
@@ -120,6 +120,11 @@ struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
     cudaMalloc((void **) &gridSampler, sizeof(CudaSampler2D));
     cudaMemcpy(gridSampler, data->gridSampler, sizeof(CudaSampler2D), cudaMemcpyHostToDevice);
     host_data->gridSampler = gridSampler;
+
+    CudaBVHAccel *bvh;
+    cudaMalloc((void **) &bvh, sizeof(CudaBVHAccel));
+    cudaMemcpy(bvh, data->bvh, sizeof(CudaBVHAccel), cudaMemcpyHostToDevice);
+    host_data->bvh = bvh;
     printf("Ending cudaMalloc\n");
     
     cudaMemcpy(cuda_data, host_data, sizeof(struct data_necessary), cudaMemcpyHostToDevice);
@@ -138,6 +143,8 @@ printf("Starting cudaMalloc\n");
     cudaFree(cuda_data->max_ray_depth);
 
     cudaFree(cuda_data->gridSampler);
+
+    cudaFree(cuda_data->bvh);
     printf("Ending cudaMalloc\n");
  
     cudaFree(cuda_data);
@@ -255,13 +262,13 @@ __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_
 
   CudaIntersection isect;
   CudaSpectrum L_out;
-  printf("hai\n");
+
   // You will extend this in part 2. 
   // If no intersection occurs, we simply return black.
   // This changes if you implement hemispherical lighting for extra credit.
   if (!cuda_data->bvh->intersect(r, &isect)) 
     return L_out;
-
+/*
   // This line returns a color depending only on the normal vector 
   // to the surface at the intersection point.
   // Remove it when you are ready to begin Part 3.
@@ -269,9 +276,10 @@ __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_
 
   // We only include the emitted light if the previous BSDF was a delta distribution
   // or if the previous ray came from the camera.
+  
   if (includeLe)
     L_out += isect.bsdf->get_emission();
-
+  
   // You will implement this in part 3. 
   // Delta BSDFs have no direct lighting since they are zero with probability 1 --
   // their values get accumulated through indirect lighting, where the BSDF 
@@ -283,7 +291,7 @@ __device__ CudaSpectrum trace_cuda_ray( CudaRay &r, bool includeLe, struct data_
   // and no further indirect lighting is calculated.
   if (r.depth > 0)
  //   L_out += estimate_indirect_lighting(r, isect, cuda_data);
-  
+*/
   return L_out;
 
 }

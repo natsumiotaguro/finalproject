@@ -33,6 +33,12 @@ void Camera::configure(const CameraInfo& info, size_t screenW, size_t screenH) {
   cudaMemcpy(cudaNClip, &nClip, sizeof(double), cudaMemcpyHostToDevice);
   cudaMemcpy(cudaFClip, &fClip, sizeof(double), cudaMemcpyHostToDevice);
 */
+  cudaMalloc((void **) &cudahFov, sizeof(double));
+  cudaMalloc((void **) &cudavFov, sizeof(double));
+
+    cudaMemcpy(cudahFov, &hFov,  sizeof(double), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudavFov, &vFov,  sizeof(double), cudaMemcpyHostToDevice);
+  
   double ar1 = tan(radians(hFov) / 2) / tan(radians(vFov) / 2);
   ar = static_cast<double>(screenW) / screenH;
   if (ar1 < ar) {

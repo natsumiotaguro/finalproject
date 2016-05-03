@@ -21,7 +21,7 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp, s
 
   	for(int i = 0; i < num_samples; i++){
 	    CudaVector2D point = CudaVector2D(((double)*x + sampler.x)/sampleBuffer->w, ((double)*y + sampler.y)/sampleBuffer->h);
-	    CudaRay r = path_cuda_generate_ray(point.x, point.y);
+	    CudaRay r = path_cuda_generate_ray(point.x, point.y, *camera->cudahFov);
 	    r.depth = *cuda_data->max_ray_depth;
 	    average += trace_cuda_ray(r, true, cuda_data);
 
@@ -46,23 +46,24 @@ __global__ void raytrace_cuda_pixel_helper(size_t* x, size_t* y, Spectrum* sp, s
 }
 
 //Originally from ccamera.cpp
-__device__ CudaRay path_cuda_generate_ray(double x, double y){
+__device__ CudaRay path_cuda_generate_ray(double x, double y, double cudahFov){
   // Part 1, Task 2:
   // compute position of the input sensor sample coordinate on the
   // canonical sensor plane one unit away from the pinhole.
   // Note: hFov and vFov are in degrees.
   // 
-  /*
-  double hFovRad = *cudahFov * (PI / 180);
-  double vFovRad = *cudavFov * (PI / 180);
-  CudaVector3D lower_left  = CudaVector3D(-tan(hFovRad*.5), -tan(vFovRad*.5),-1);
-  CudaVector3D upper_right = CudaVector3D( tan(hFovRad*.5),  tan(vFovRad*.5),-1);
-  CudaVector3D direction = CudaVector3D(lower_left.x + x*(upper_right.x - lower_left.x), 
-                                 lower_left.y + y*(upper_right.y - lower_left.y),
-                                    -1 );
-  direction = *cudac2w*direction;
-  direction.normalize();
   
+  double hFovRad = cudahFov * (3.1415 / 180);
+  //double vFovRad = cudavFov * (PI / 180);
+   
+  //CudaVector3D lower_left  = CudaVector3D(-tan(hFovRad*.5), -tan(vFovRad*.5),-1);
+  //CudaVector3D upper_right = CudaVector3D( tan(hFovRad*.5),  tan(vFovRad*.5),-1);
+  //CudaVector3D direction = CudaVector3D(lower_left.x + x*(upper_right.x - lower_left.x), 
+  //                               lower_left.y + y*(upper_right.y - lower_left.y),
+  //                                  -1 );
+  //direction = *cudac2w*direction;
+  //direction.normalize();
+  /*
   CudaRay my_ray = CudaRay(*cudaPos, direction);
   my_ray.min_t = *cudaNClip;
   my_ray.max_t = *cudaFClip;
@@ -87,6 +88,7 @@ void cudaMemcpy(size_t* ns_aa, HDRImageBuffer* sampleBuffer, Camera* c){
 
 __global__ void instantiate_Necesary(struct data_necessary* data){
 	//BVH Instantiation Here
+	//device_bvh->arry = device_primitiveArr; 
 }
 
 //Returns struct with all CUDA pointers
@@ -126,7 +128,8 @@ struct data_necessary* cudaMallocNecessary(struct host_data_necessary* data){
     cudaMemcpy(bvh, data->bvh, sizeof(CudaBVHAccel), cudaMemcpyHostToDevice);
     host_data->bvh = bvh;
     printf("Ending cudaMalloc\n");
-    
+
+
     cudaMemcpy(cuda_data, host_data, sizeof(struct data_necessary), cudaMemcpyHostToDevice);
     return cuda_data;
 }

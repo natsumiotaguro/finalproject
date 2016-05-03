@@ -91,12 +91,11 @@ class Camera {
 
   __device__ CudaRay cuda_generate_ray(double x, double y);
  
- private:
   // Computes pos, screenXDir, screenYDir from target, r, phi, theta.
   void compute_position();
   // Field of view aspect ratio, clipping planes.
   double hFov, vFov, ar, nClip, fClip;
-  //double *cudahFov, *cudavFov, *cudaAR, *cudaNClip, *cudaFClip;
+  double *cudahFov, *cudavFov, *cudaAR, *cudaNClip, *cudaFClip;
   // Current position and target point (the point the camera is looking at).
   Vector3D pos, targetPos;
   //CudaVector3D *cudaPos, *cudaTargetPos;

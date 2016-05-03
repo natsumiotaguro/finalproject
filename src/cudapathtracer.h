@@ -80,7 +80,7 @@ void raytrace_cuda_tile(int tile_x, int tile_y,
 void testblahlah();
 
 //camera
-__device__ CudaRay path_cuda_generate_ray(double x, double y);
+__device__ CudaRay path_cuda_generate_ray(double x, double y, double cudahFov);
 
 
 
